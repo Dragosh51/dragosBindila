@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Information</title>
+    <!-- Reference local jQuery file -->
+    <script src="jquery-3.7.1.min.js"></script>
+    <!-- Link to your custom JavaScript file -->
+    <script src="script.js"></script>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>API Information</h1>
+    <table>
+        <tr>
+            <th>API Name</th>
+            <th>API Description / User Input</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td rowspan="3">Weather Information</td>
+            <td rowspan="3">Get weather information by providing latitude and longitude.</td>
+            <td rowspan="3">
+                <input type="text" id="weatherLat" placeholder="Latitude"><br>
+                <input type="text" id="weatherLng" placeholder="Longitude"><br>
+                <button id="btnWeather" class="submit-btn" data-api="weather">Get Weather</button>
+            </td>
+        </tr>
+        <tr></tr>
+        <tr></tr>
+        <tr>
+            <td rowspan="3">Timezone Information</td>
+            <td rowspan="3">Get timezone information by providing latitude and longitude.</td>
+            <td rowspan="3">
+                <input type="text" id="timezoneLat" placeholder="Latitude"><br>
+                <input type="text" id="timezoneLng" placeholder="Longitude"><br>
+                <button id="btnTimezone" class="submit-btn" data-api="timezone">Get Timezone</button>
+            </td>
+        </tr>
+        <tr></tr>
+        <tr></tr>
+        <tr>
+            <td rowspan="3">Earthquake Information</td>
+            <td rowspan="3">Get earthquake information by providing latitude and longitude.</td>
+            <td rowspan="3">
+                <input type="text" id="earthquakeLat" placeholder="Latitude"><br>
+                <input type="text" id="earthquakeLng" placeholder="Longitude"><br>
+                <button id="btnEarthquake" class="submit-btn" data-api="earthquake">Get Earthquake</button>
+            </td>
+        </tr>
+        <tr></tr>
+        <tr></tr>
+        <tr>
+            <td colspan="3" id="result"></td>
+        </tr>
+    </table>
+</body>
+</html>
+
+
+
