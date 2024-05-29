@@ -1,7 +1,7 @@
 $(document).ready(function() {
     $('#btnWeather').click(function() {
         $.ajax({
-            url: "../php/getWeatherInfo.php",
+            url: "libs/php/getWeatherInfo.php", // Ensure this path is correct
             type: 'POST',
             dataType: 'json',
             data: {
@@ -28,7 +28,7 @@ $(document).ready(function() {
 
     $('#btnTimezone').click(function() {
         $.ajax({
-            url: "../php/getTimezoneInfo.php",
+            url: "libs/php/getTimezoneInfo.php", // Ensure this path is correct
             type: 'POST',
             dataType: 'json',
             data: {
@@ -55,7 +55,7 @@ $(document).ready(function() {
 
     $('#btnEarthquake').click(function() {
         $.ajax({
-            url: "../php/getEarthquakeInfo.php",
+            url: "libs/php/getEarthquakeInfo.php", // Ensure this path is correct
             type: 'POST',
             dataType: 'json',
             data: {
@@ -80,3 +80,4 @@ $(document).ready(function() {
         });
     });
 });
+
