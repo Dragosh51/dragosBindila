@@ -1,7 +1,7 @@
 $(document).ready(function() {
     $('#btnWeather').click(function() {
         $.ajax({
-            url: "../libs/php/getWeatherInfo.php",
+            url: "../php/getWeatherInfo.php",
             type: 'POST',
             dataType: 'json',
             data: {
@@ -28,7 +28,7 @@ $(document).ready(function() {
 
     $('#btnTimezone').click(function() {
         $.ajax({
-            url: "../libs/php/getTimezoneInfo.php",
+            url: "../php/getTimezoneInfo.php",
             type: 'POST',
             dataType: 'json',
             data: {
@@ -55,7 +55,7 @@ $(document).ready(function() {
 
     $('#btnEarthquake').click(function() {
         $.ajax({
-            url: "../libs/php/getEarthquakeInfo.php",
+            url: "../php/getEarthquakeInfo.php",
             type: 'POST',
             dataType: 'json',
             data: {
