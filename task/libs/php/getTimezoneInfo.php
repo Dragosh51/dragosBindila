@@ -7,7 +7,7 @@ $executionStartTime = microtime(true);
 $lat = $_POST['lat'];
 $lng = $_POST['lng'];
 
-$url = 'http://api.geonames.org/timezoneJSON?formatted=true&lat=' . $lat . '&lng=' . $lng . '&username=flightltd&style=full';
+$url = 'http://api.geonames.org/timezoneJSON?formatted=true&lat=' . $lat . '&lng=' . $lng . '&username=bindil01&style=full';
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
