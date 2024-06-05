@@ -28,7 +28,23 @@ var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
 });
 
 var sunBtn = L.easyButton("fa-sun fa-xl", function (btn, map) {
-  alert('Sun button clicked!');
+  $("#sunModal").modal("show");
+});
+
+var newsBtn = L.easyButton("fa-newspaper fa-xl", function (btn, map) {
+  $("#newsModal").modal("show");
+});
+
+var wikiBtn = L.easyButton("fa-w fa-xl", function (btn, map) {
+  $("#wikiModal").modal("show");
+});
+
+var timezoneBtn = L.easyButton("fa-clock fa-xl", function (btn, map) {
+  $("#timezoneModal").modal("show");
+});
+
+var earthquakeBtn = L.easyButton("fa-mountain fa-xl", function (btn, map) {
+  $("#earthquakeModal").modal("show");
 });
 
 // ---------------------------------------------------------
@@ -39,9 +55,9 @@ var sunBtn = L.easyButton("fa-sun fa-xl", function (btn, map) {
 
 $(document).ready(function () {
   map = L.map("map", {
-      layers: [streets]
+    layers: [streets]
   }).setView([54.5, -4], 6);
-  
+
   // setView is not required in your application as you will be
   // deploying map.fitBounds() on the country border polygon
 
@@ -49,37 +65,39 @@ $(document).ready(function () {
 
   infoBtn.addTo(map);
   sunBtn.addTo(map);
-
-  // Call the function to populate the country dropdown
+  newsBtn.addTo(map);
+  wikiBtn.addTo(map);
+  timezoneBtn.addTo(map);
+  earthquakeBtn.addTo(map);
   
+  // Call the function to populate the country dropdown
   populateCountryDropdown();
 });
 
 // Function to populate the country dropdown
 function populateCountryDropdown() {
-  
+
   $.ajax({
-      url: "libs/php/getCountryInfo.php",
-      type: 'POST',
-      dataType: 'json',
-      success: function(result) {
-          console.log(result);
-          if (result.status.name === "ok") {
-              var dropdown = $('#countrySelect');
-              dropdown.empty();
-              dropdown.append('<option selected="true" disabled>Choose Country</option>');
-              
-              $.each(result.data, function(key, entry) {
-                  
-                  dropdown.append($('<option></option>').attr('value', entry.countryCode).text(entry.countryName));
-              });
-          } else {
-              console.error("Error: " + result.status.description);
-          }
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-          console.error("Error: " + textStatus + " - " + errorThrown);
-          console.log(jqXHR.responseText);
+    url: "libs/php/getCountryInfo.php",
+    type: 'POST',
+    dataType: 'json',
+    success: function (result) {
+      console.log(result);
+      if (result.status.name === "ok") {
+        var dropdown = $('#countrySelect');
+        dropdown.empty();
+        dropdown.append('<option selected="true" disabled>Choose Country</option>');
+        $.each(result.data, function (key, entry) {
+
+          dropdown.append($('<option></option>').attr('value', entry.countryCode).text(entry.countryName));
+        });
+      } else {
+        console.error("Error: " + result.status.description);
       }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error("Error: " + textStatus + " - " + errorThrown);
+      console.log(jqXHR.responseText);
+    }
   });
 }
