@@ -27,8 +27,8 @@ var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
   $("#exampleModal").modal("show");
 });
 
-var sunBtn = L.easyButton("fa-sun fa-xl", function (btn, map) {
-  $("#sunModal").modal("show");
+var weatherBtn = L.easyButton("fa-sun fa-xl", function (btn, map) {
+  $("#weatherModal").modal("show");
 });
 
 var newsBtn = L.easyButton("fa-newspaper fa-xl", function (btn, map) {
@@ -54,50 +54,100 @@ var earthquakeBtn = L.easyButton("fa-mountain fa-xl", function (btn, map) {
 // initialise and add controls once DOM is ready
 
 $(document).ready(function () {
+  // Initialize the map
   map = L.map("map", {
-    layers: [streets]
+      layers: [streets]
   }).setView([54.5, -4], 6);
-
-  // setView is not required in your application as you will be
-  // deploying map.fitBounds() on the country border polygon
 
   layerControl = L.control.layers(basemaps).addTo(map);
 
   infoBtn.addTo(map);
-  sunBtn.addTo(map);
+  weatherBtn.addTo(map);
   newsBtn.addTo(map);
   wikiBtn.addTo(map);
   timezoneBtn.addTo(map);
   earthquakeBtn.addTo(map);
-  
-  // Call the function to populate the country dropdown
+  weatherBtn.addTo(map);
+
+  // Populate the country dropdown
   populateCountryDropdown();
+
+  // Add change event listener to the country dropdown
+  $('#countrySelect').change(function() {
+      const selectedCountryCode = $(this).val();
+      const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
+      const lat = selectedOption.data('latitude');
+      const lng = selectedOption.data('longitude');
+      const countryName = selectedOption.text();
+
+      updateWeatherModal(countryName);
+      updateCountryModal(selectedOption.data());
+  });
 });
 
-// Function to populate the country dropdown
 function populateCountryDropdown() {
+  
+  $.ajax({
+      url: 'libs/php/getCountryInfo.php',
+      method: 'GET',
+      success: function(data) {
+          if (data.status.code === "200") {
+              var options = '';
+              data.data.forEach(function(country) {
+                  options += `<option value="${country.countryCode}" data-capital="${country.capital}" data-population="${country.population}" data-area="${country.areaInSqKm}" data-continent="${country.continentName}" data-postal="${country.postalCodeFormat}">${country.countryName}</option>`;
+              });
+              $('#countrySelect').html(options);
+          } else {
+              console.error('Error fetching country data:', data.status.description);
+          }
+      },
+      error: function(err) {
+          console.log("Error: ", err);
+      }
+  });
+}
+
+function updateWeatherModal(countryName) {
+  // Encode the countryName
+  var encodedCountryName = encodeURIComponent(countryName);
 
   $.ajax({
-    url: "libs/php/getCountryInfo.php",
-    type: 'POST',
-    dataType: 'json',
-    success: function (result) {
-      console.log(result);
-      if (result.status.name === "ok") {
-        var dropdown = $('#countrySelect');
-        dropdown.empty();
-        dropdown.append('<option selected="true" disabled>Choose Country</option>');
-        $.each(result.data, function (key, entry) {
-
-          dropdown.append($('<option></option>').attr('value', entry.countryCode).text(entry.countryName));
-        });
-      } else {
-        console.error("Error: " + result.status.description);
+      url: 'libs/php/getWeatherInfo.php',
+      method: 'GET',
+      data: { q: encodedCountryName }, // Use the encoded countryName
+      success: function(data) {
+          console.log('Response data:', data);
+          if (data.status && data.status.code === "200") {
+              var weatherContent = '<ul>';
+              weatherContent += '<li><strong>Country:</strong> ' + data.data.country + '</li>';
+              weatherContent += '<li><strong>Temperature (C):</strong> ' + data.data.temp_c + '</li>';
+              weatherContent += '<li><strong>Condition:</strong> ' + data.data.condition + '</li>';
+              weatherContent += '</ul>';
+              $('#weatherModal .modal-body').html(weatherContent);
+              $('#weatherModal').modal('show');
+          } else {
+              console.error('Error fetching weather data:', data.status ? data.status.description : 'Unknown error');
+          }
+      },
+      error: function(xhr, status, error) {
+          console.error('Error fetching weather data:', error);
       }
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      console.error("Error: " + textStatus + " - " + errorThrown);
-      console.log(jqXHR.responseText);
-    }
   });
+}
+
+function updateCountryModal(countryData) {
+  console.log("Country Data", countryData); // Check the received data
+
+  var countryContent = '<table class="table table-striped">';
+  countryContent += '<tr><td><strong>Country Code:</strong></td><td>' + countryData.countryCode + '</td></tr>';
+  countryContent += '<tr><td><strong>Country Name:</strong></td><td>' + countryData.countryName + '</td></tr>';
+  countryContent += '<tr><td><strong>Capital:</strong></td><td>' + countryData.capital + '</td></tr>';
+  countryContent += '<tr><td><strong>Population:</strong></td><td>' + countryData.population + '</td></tr>';
+  countryContent += '<tr><td><strong>Area (sq km):</strong></td><td>' + countryData.area + '</td></tr>'; // Use 'area' instead of 'areaInSqKm'
+  countryContent += '<tr><td><strong>Continent:</strong></td><td>' + countryData.continent + '</td></tr>'; // Use 'continent' instead of 'continentName'
+  countryContent += '<tr><td><strong>Postal Code Format:</strong></td><td>' + countryData.postal + '</td></tr>'; // Use 'postal' instead of 'postalCodeFormat'
+  countryContent += '</table>';
+
+  $('#exampleModal .modal-body').html(countryContent);
+  $('#exampleModal').modal('show');
 }

@@ -4,7 +4,15 @@ error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
-$url = 'http://api.geonames.org/countryInfoJSON?formatted=true&lang=&country=&username=bindil01&style=full';
+if (!isset($_GET['q'])) {
+    echo json_encode(["status" => ["code" => "400", "name" => "fail", "description" => "Missing parameters"]]);
+    exit;
+}
+
+$q = $_GET['q'];
+$apiKey = 'e56d35fb8bf84a05bd6115208240606';
+
+$url = "http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$q&aqi=yes";
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -27,30 +35,15 @@ if ($decode === null) {
     exit;
 }
 
-$countries = [];
-if (isset($decode['geonames'])) {
-    foreach ($decode['geonames'] as $country) {
-        $countries[] = [
-            'countryCode' => $country['countryCode'],
-            'countryName' => $country['countryName'],
-            'capital' => $country['capital'],
-            'population' => $country['population'],
-            'areaInSqKm' => $country['areaInSqKm'],
-            'north' => $country['north'],
-            'south' => $country['south'],
-            'east' => $country['east'],
-            'west' => $country['west'],
-            'continentName' => $country['continentName'],
-            'postalCodeFormat' => $country['postalCodeFormat']
-        ];
-    }
-}
-
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-$output['data'] = $countries;
+$output['data'] = [
+    'country' => $decode['location']['country'],
+    'temp_c' => $decode['current']['temp_c'],
+    'condition' => $decode['current']['condition']['text']
+];
 
 header('Content-Type: application/json; charset=UTF-8');
 echo json_encode($output);
