@@ -39,8 +39,8 @@ var wikiBtn = L.easyButton("fa-w fa-xl", function (btn, map) {
   $("#wikiModal").modal("show");
 });
 
-var timezoneBtn = L.easyButton("fa-clock fa-xl", function (btn, map) {
-  $("#timezoneModal").modal("show");
+var exchangeBtn = L.easyButton("fa-clock fa-xl", function (btn, map) {
+  $("#exchangeRatesModal").modal("show");
 });
 
 var earthquakeBtn = L.easyButton("fa-mountain fa-xl", function (btn, map) {
@@ -65,12 +65,13 @@ $(document).ready(function () {
   weatherBtn.addTo(map);
   newsBtn.addTo(map);
   wikiBtn.addTo(map);
-  timezoneBtn.addTo(map);
+  exchangeBtn.addTo(map);
   earthquakeBtn.addTo(map);
   weatherBtn.addTo(map);
 
   // Populate the country dropdown
   populateCountryDropdown();
+  getExchangeRates();
 
   // Add change event listener to the country dropdown
   $('#countrySelect').change(function() {
@@ -150,4 +151,26 @@ function updateCountryModal(countryData) {
 
   $('#exampleModal .modal-body').html(countryContent);
   $('#exampleModal').modal('show');
+}
+
+function getExchangeRates() {
+  $.ajax({
+      url: "libs/php/getExchangeRates.php", 
+      type: 'GET',
+      dataType: 'json',
+      success: function(result) {
+          console.log(result);
+          if (result.status !== 'error') {
+              // Display exchange rates in a modal or other UI element
+              $('#exchangeRatesModal .modal-body').html(JSON.stringify(result.rates, null, 2));
+              $('#exchangeRatesModal').modal('show');
+          } else {
+              console.error("Error: " + result.message);
+          }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+          console.error("Error: " + textStatus + " - " + errorThrown);
+          console.log(jqXHR.responseText);
+      }
+  });
 }
