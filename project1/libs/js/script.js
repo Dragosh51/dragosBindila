@@ -24,7 +24,7 @@ var basemaps = {
 // buttons
 
 var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
-  $("#exampleModal").modal("show");
+  $("#infoModal").modal("show");
 });
 
 var weatherBtn = L.easyButton("fa-sun fa-xl", function (btn, map) {
@@ -82,7 +82,7 @@ $(document).ready(function () {
       const countryName = selectedOption.text();
 
       updateWeatherModal(countryName);
-      updateCountryModal(selectedOption.data());
+      updateInfoModal(countryName, selectedOption);
   });
 });
 
@@ -95,7 +95,7 @@ function populateCountryDropdown() {
           if (data.status.code === "200") {
               var options = '';
               data.data.forEach(function(country) {
-                  options += `<option value="${country.countryCode}" data-capital="${country.capital}" data-population="${country.population}" data-area="${country.areaInSqKm}" data-continent="${country.continentName}" data-postal="${country.postalCodeFormat}">${country.countryName}</option>`;
+                  options += `<option value="${country.countryCode}" > ${country.countryName}</option>`;
               });
               $('#countrySelect').html(options);
           } else {
@@ -125,7 +125,6 @@ function updateWeatherModal(countryName) {
               weatherContent += '<li><strong>Condition:</strong> ' + data.data.condition + '</li>';
               weatherContent += '</ul>';
               $('#weatherModal .modal-body').html(weatherContent);
-              $('#weatherModal').modal('show');
           } else {
               console.error('Error fetching weather data:', data.status ? data.status.description : 'Unknown error');
           }
@@ -136,22 +135,22 @@ function updateWeatherModal(countryName) {
   });
 }
 
-function updateCountryModal(countryData) {
-  console.log("Country Data", countryData); // Check the received data
+// function updateCountryModal(countryData) {
+//   console.log("Country Data", countryData);
 
-  var countryContent = '<table class="table table-striped">';
-  countryContent += '<tr><td><strong>Country Code:</strong></td><td>' + countryData.countryCode + '</td></tr>';
-  countryContent += '<tr><td><strong>Country Name:</strong></td><td>' + countryData.countryName + '</td></tr>';
-  countryContent += '<tr><td><strong>Capital:</strong></td><td>' + countryData.capital + '</td></tr>';
-  countryContent += '<tr><td><strong>Population:</strong></td><td>' + countryData.population + '</td></tr>';
-  countryContent += '<tr><td><strong>Area (sq km):</strong></td><td>' + countryData.area + '</td></tr>'; // Use 'area' instead of 'areaInSqKm'
-  countryContent += '<tr><td><strong>Continent:</strong></td><td>' + countryData.continent + '</td></tr>'; // Use 'continent' instead of 'continentName'
-  countryContent += '<tr><td><strong>Postal Code Format:</strong></td><td>' + countryData.postal + '</td></tr>'; // Use 'postal' instead of 'postalCodeFormat'
-  countryContent += '</table>';
+//   var countryContent = '<table class="table table-striped">';
+//   countryContent += '<tr><td><strong>Country Code:</strong></td><td>' + countryData.countryCode + '</td></tr>';
+//   countryContent += '<tr><td><strong>Country Name:</strong></td><td>' + countryData.countryName + '</td></tr>';
+//   countryContent += '<tr><td><strong>Capital:</strong></td><td>' + countryData.capital + '</td></tr>';
+//   countryContent += '<tr><td><strong>Population:</strong></td><td>' + countryData.population + '</td></tr>';
+//   countryContent += '<tr><td><strong>Area (sq km):</strong></td><td>' + countryData.area + '</td></tr>'; // Use 'area' instead of 'areaInSqKm'
+//   countryContent += '<tr><td><strong>Continent:</strong></td><td>' + countryData.continent + '</td></tr>'; // Use 'continent' instead of 'continentName'
+//   countryContent += '<tr><td><strong>Postal Code Format:</strong></td><td>' + countryData.postal + '</td></tr>'; // Use 'postal' instead of 'postalCodeFormat'
+//   countryContent += '</table>';
 
-  $('#exampleModal .modal-body').html(countryContent);
-  $('#exampleModal').modal('show');
-}
+//   $('#exampleModal .modal-body').html(countryContent);
+  
+// }
 
 function getExchangeRates() {
   $.ajax({
@@ -163,7 +162,6 @@ function getExchangeRates() {
           if (result.status !== 'error') {
               // Display exchange rates in a modal or other UI element
               $('#exchangeRatesModal .modal-body').html(JSON.stringify(result.rates, null, 2));
-              $('#exchangeRatesModal').modal('show');
           } else {
               console.error("Error: " + result.message);
           }
@@ -171,6 +169,56 @@ function getExchangeRates() {
       error: function(jqXHR, textStatus, errorThrown) {
           console.error("Error: " + textStatus + " - " + errorThrown);
           console.log(jqXHR.responseText);
+      }
+  });
+}
+
+function updateInfoModal(countryName, selectedOption) {
+  // Encode the countryName
+  var encodedCountryName = encodeURIComponent(countryName);
+  console.log('country info opencage', countryName);
+
+  $.ajax({
+      url: 'libs/php/getInfo.php', 
+      method: 'GET',
+      data: { q: encodedCountryName }, // Use the encoded countryName
+      success: function(data) {
+          console.log('Response data:', data);
+          if (data.status && data.status.code === "200") {
+              var results = data.data.results[0]; // Assuming the first result is the most relevant
+              
+              var countryData = {
+                  countryCode: selectedOption.val(),
+                  countryName: selectedOption.text(),
+                  carOrientation: results.annotations.roadinfo.drive_on,
+                  capital: results.components.state || 'Unknown', // Assuming state as capital
+                  currency: results.annotations.currency.name, // Replace with actual population data if available
+                  timeZone: results.annotations.timezone.name, // Replace with actual area data if available
+                  continent: results.components.continent,
+                  postal: 'Unknown' // Replace with actual postal code format if available
+              };
+
+              // Combine country info into one modal content
+              var countryContent = '<table class="table table-striped">';
+              countryContent += '<tr><td class="text-center"><i class="fa-solid fa-car fa-xl text-success"></i></td><td><strong>Driving side:</strong></td><td class="text-end">' + countryData.carOrientation + '</td></tr>';
+              countryContent += '<tr><td class="text-center"><i class="fa-solid fa-heart fa-xl text-success"></i></td><td><strong>Latitude:</strong></td><td class="text-end">' + results.geometry.lat + '</td></tr>';
+              countryContent += '<tr><td class="text-center"><i class="fa-solid fa-car fa-xl text-success"></i></td><td><strong>Longitude:</strong></td><td class="text-end">' + results.geometry.lng + '</td></tr>';
+              countryContent += '<tr><td class="text-center"><i class="fa-solid fa-globe fa-xl text-success"></i></td><td><strong>Country:</strong></td><td class="text-end">' + countryData.countryName + '</td></tr>';
+              countryContent += '<tr><td class="text-center"><i class="fa-solid fa-flag fa-xl text-success"></i></td><td><strong>Country Code:</strong></td><td class="text-end">' + countryData.countryCode + '</td></tr>';
+              // countryContent += '<tr><td class="text-center"><i class="fa-solid fa-city fa-xl text-success"></i></td><td><strong>Capital:</strong></td><td class="text-end">' + countryData.capital + '</td></tr>';
+              countryContent += '<tr><td class="text-center"><i class="fa-solid fa-money-bill-wave fa-xl text-success"></i></td><td><strong>Currency:</strong></td><td class="text-end">' + countryData.currency + '</td></tr>';
+              countryContent += '<tr><td class="text-center"><i class="fa-solid fa-clock fa-xl text-success"></i></td><td><strong>Time Zone:</strong></td><td class="text-end">' + countryData.timeZone + '</td></tr>';
+              countryContent += '<tr><td class="text-center"><i class="fa-solid fa-globe-europe fa-xl text-success"></i></td><td><strong>Continent:</strong></td><td class="text-end">' + countryData.continent + '</td></tr>';
+              // countryContent += '<tr><td class="text-center"><i class="fa-solid fa-mail-bulk fa-xl text-success"></i></td><td><strong>Postal Code Format:</strong></td><td class="text-end">' + countryData.postal + '</td></tr>';
+              countryContent += '</table>';
+
+              $('#infoModal .modal-body').html(countryContent);
+          } else {
+              console.error('Error fetching geocode data:', data.status ? data.status.description : 'Unknown error');
+          }
+      },
+      error: function(xhr, status, error) {
+          console.error('Error fetching geocode data:', error);
       }
   });
 }
