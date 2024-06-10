@@ -423,20 +423,34 @@
   <!-- Modal for Exchange Button -->
   <div id="exchangeRatesModal" class="modal" data-bs-backdrop="false" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content shadow">
-        <div class="modal-header bg-success bg-gradient text-white">
-          <h5 class="modal-title">Exchange Rate</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content shadow">
+            <div class="modal-header bg-success bg-gradient text-white">
+                <h5 class="modal-title">Exchange Rate</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount (USD)</label>
+                    <input type="number" id="amount" class="form-control" placeholder="0" min="0" step="0.01">
+                </div>
+                <div class="mb-3">
+                    <label for="currency" class="form-label">Currency</label>
+                    <select id="exchangeRatesSelect" class="form-control">
+                      <!-- Exchange rates options will be loaded here -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="result" class="form-label">Converted Amount</label>
+                    <input type="text" id="result" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="convertCurrency()">Convert</button>
+                <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
-        <div class="modal-body">
-          <p>Exchange rate information will be displayed here.</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
+</div>
 
   <!-- Modal for Earthquake Button -->
   <div id="earthquakeModal" class="modal" data-bs-backdrop="false" tabindex="-1">

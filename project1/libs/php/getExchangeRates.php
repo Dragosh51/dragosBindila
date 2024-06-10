@@ -14,7 +14,7 @@ $response = curl_exec($ch);
 
 // Check for errors
 if (curl_errno($ch)) {
-    echo 'Error:' . curl_error($ch);
+    echo json_encode(['status' => 'error', 'message' => 'Error:' . curl_error($ch)]);
     exit;
 }
 
@@ -30,7 +30,10 @@ if (isset($data['rates'])) {
     header('Content-Type: application/json');
 
     // Return the data as a JSON object
-    echo json_encode($data);
+    echo json_encode([
+        'status' => 'ok',
+        'rates' => $data['rates']
+    ]);
 } else {
     // Return an error if the data is not present
     echo json_encode(['status' => 'error', 'message' => 'Unable to fetch exchange rates.']);

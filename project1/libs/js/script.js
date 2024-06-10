@@ -39,7 +39,7 @@ var wikiBtn = L.easyButton("fa-w fa-xl", function (btn, map) {
   $("#wikiModal").modal("show");
 });
 
-var exchangeBtn = L.easyButton("fa-clock fa-xl", function (btn, map) {
+var exchangeBtn = L.easyButton("fa-money-bill-wave fa-xl", function (btn, map) {
   $("#exchangeRatesModal").modal("show");
 });
 
@@ -135,33 +135,20 @@ function updateWeatherModal(countryName) {
   });
 }
 
-// function updateCountryModal(countryData) {
-//   console.log("Country Data", countryData);
-
-//   var countryContent = '<table class="table table-striped">';
-//   countryContent += '<tr><td><strong>Country Code:</strong></td><td>' + countryData.countryCode + '</td></tr>';
-//   countryContent += '<tr><td><strong>Country Name:</strong></td><td>' + countryData.countryName + '</td></tr>';
-//   countryContent += '<tr><td><strong>Capital:</strong></td><td>' + countryData.capital + '</td></tr>';
-//   countryContent += '<tr><td><strong>Population:</strong></td><td>' + countryData.population + '</td></tr>';
-//   countryContent += '<tr><td><strong>Area (sq km):</strong></td><td>' + countryData.area + '</td></tr>'; // Use 'area' instead of 'areaInSqKm'
-//   countryContent += '<tr><td><strong>Continent:</strong></td><td>' + countryData.continent + '</td></tr>'; // Use 'continent' instead of 'continentName'
-//   countryContent += '<tr><td><strong>Postal Code Format:</strong></td><td>' + countryData.postal + '</td></tr>'; // Use 'postal' instead of 'postalCodeFormat'
-//   countryContent += '</table>';
-
-//   $('#exampleModal .modal-body').html(countryContent);
-  
-// }
 
 function getExchangeRates() {
   $.ajax({
-      url: "libs/php/getExchangeRates.php", 
+      url: "libs/php/getExchangeRates.php",
       type: 'GET',
       dataType: 'json',
       success: function(result) {
-          console.log(result);
+          console.log("exchange",result);
           if (result.status !== 'error') {
-              // Display exchange rates in a modal or other UI element
-              $('#exchangeRatesModal .modal-body').html(JSON.stringify(result.rates, null, 2));
+              var options = '';
+              $.each(result.rates, function(currency, rate) {
+                options += `<option value="${rate}" data-currency="${currency}">${currency}</option>`;
+              });
+              $('#exchangeRatesSelect').html(options);
           } else {
               console.error("Error: " + result.message);
           }
@@ -171,6 +158,20 @@ function getExchangeRates() {
           console.log(jqXHR.responseText);
       }
   });
+}
+
+function convertCurrency() {
+  var amount = parseFloat($('#amount').val());
+  var rate = parseFloat($('#exchangeRatesSelect').val());
+  var currency = $('#exchangeRatesSelect option:selected').data('currency');
+
+  if (isNaN(amount) || isNaN(rate)) {
+      alert('Please enter a valid amount and select a currency.');
+      return;
+  }
+
+  var convertedAmount = amount * rate;
+  $('#result').val(convertedAmount.toFixed(2) + ' ' + currency);
 }
 
 function updateInfoModal(countryName, selectedOption) {
