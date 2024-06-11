@@ -12,7 +12,7 @@ if (!isset($_GET['q'])) {
 $q = $_GET['q'];
 $apiKey = 'e56d35fb8bf84a05bd6115208240606';
 
-$url = "http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$q&aqi=yes";
+$url = "http://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=$q&days=3&aqi=yes&alerts=no";
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -39,11 +39,7 @@ $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-$output['data'] = [
-    'country' => $decode['location']['country'],
-    'temp_c' => $decode['current']['temp_c'],
-    'condition' => $decode['current']['condition']['text']
-];
+$output['data'] = $decode;
 
 header('Content-Type: application/json; charset=UTF-8');
 echo json_encode($output);
