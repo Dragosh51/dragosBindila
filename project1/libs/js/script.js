@@ -79,6 +79,8 @@ $(document).ready(function () {
 
     updateWeatherModal(countryName);
     updateInfoModal(countryName, selectedOption);
+    fetchWikipediaData(countryName);
+    fetchNewsData(selectedCountryCode);
   });
 
   $('#amount').on('input', convertCurrency);
@@ -269,5 +271,64 @@ function updateInfoModal(countryName, selectedOption) {
     error: function (xhr, status, error) {
       console.error('Error fetching geocode data:', error);
     }
+  });
+}
+
+function fetchWikipediaData(query) {
+  $.ajax({
+    url: 'libs/php/getWikiData.php',
+    method: 'GET',
+    data: { q: query, maxRows: 10 },
+    success: function (data) {
+      if (data.status.code === "200") {
+        var wikiContent = '';
+        data.data.geonames.forEach(function (entry) {
+          wikiContent += `<h5>${entry.title}</h5>`;
+          wikiContent += `<p>${entry.summary}</p>`;
+          wikiContent += `<a href="${entry.wikipediaUrl}" target="_blank">Read more</a><hr>`;
+        });
+        $('#wikiModal .modal-body').html(wikiContent);
+        // $('#wikiModal').modal('show');
+      } else {
+        console.error('Error fetching Wikipedia data:', data.status.description);
+        $('#wikiModal .modal-body').html('<p>Error fetching Wikipedia data.</p>');
+      }
+    },
+    error: function (err) {
+      console.log("Error: ", err);
+      $('#wikiModal .modal-body').html('<p>Error fetching Wikipedia data.</p>');
+    }
+  });
+}
+
+function fetchNewsData(countryCode) {
+  var encodedCountryCode = encodeURIComponent(countryCode);
+  console.log('Country code news', countryCode)
+
+  $.ajax({
+      url: 'libs/php/getNewsData.php',
+      method: 'GET',
+      data: { q: encodedCountryCode },
+      success: function (data) {
+          console.log('API Response:', data);
+
+          if (data.status.code === "200") {
+              var newsContent = '';
+              data.data.forEach(function (article) {
+                  newsContent += `<h5>${article.title}</h5>`;
+                  newsContent += `<p>${article.publishedAt}</p>`;
+                  newsContent += `<a href="${article.url}" target="_blank">Read more</a><hr>`;
+              });
+              $('#newsModal .modal-body').html(newsContent);
+              
+          } else {
+              console.error('Error fetching news data:', data.message);
+              $('#newsModal .modal-body').html('<p>Error fetching news data.</p>');
+          }
+      },
+      error: function (xhr, status, error) {
+          console.error("AJAX Error:", status, error);
+          $('#newsModal .modal-body').html('<p>Error fetching news data.</p>');
+      }
   });
 }
