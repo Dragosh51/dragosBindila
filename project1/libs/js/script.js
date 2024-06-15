@@ -53,7 +53,7 @@ var exchangeBtn = L.easyButton("fa-money-bill-wave fa-xl", function (btn, map) {
 $(document).ready(function () {
   // Initialize the map
   map = L.map("map", {
-    layers: [streets]
+      layers: [streets]
   }).setView([54.5, -4], 6);
 
   layerControl = L.control.layers(basemaps).addTo(map);
@@ -71,45 +71,101 @@ $(document).ready(function () {
 
   // Add change event listener to the country dropdown
   $('#countrySelect').change(function () {
-    const selectedCountryCode = $(this).val();
-    const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
-    const lat = selectedOption.data('latitude');
-    const lng = selectedOption.data('longitude');
-    const countryName = selectedOption.text();
+      const selectedCountryCode = $(this).val();
+      const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
+      const lat = selectedOption.data('latitude');
+      const lng = selectedOption.data('longitude');
+      const countryName = selectedOption.text();
 
-    updateWeatherModal(countryName);
-    updateInfoModal(countryName, selectedOption);
-    fetchWikipediaData(countryName);
-    fetchNewsData(selectedCountryCode);
+      updateWeatherModal(countryName);
+      updateInfoModal(countryName, selectedOption);
+      fetchWikipediaData(countryName);
+      fetchNewsData(selectedCountryCode);
   });
 
   $('#amount').on('input', convertCurrency);
   $('#exchangeRatesSelect').on('change', convertCurrency);
 });
 
-
-
 function populateCountryDropdown() {
+  $.getJSON('countryBorders.geo.json', function(data) {
+      console.log('Loaded country borders:', data);
 
-  $.ajax({
-    url: 'libs/php/getCountryInfo.php',
-    method: 'GET',
-    success: function (data) {
-      if (data.status.code === "200") {
-        var options = '';
-        data.data.forEach(function (country) {
-          options += `<option value="${country.countryCode}" > ${country.countryName}</option>`;
-        });
-        $('#countrySelect').html(options);
-      } else {
-        console.error('Error fetching country data:', data.status.description);
-      }
-    },
-    error: function (err) {
-      console.log("Error: ", err);
-    }
+      var options = '';
+      data.features.forEach(function (country) {
+          var countryCode = country.properties.iso_a2;
+          var countryName = country.properties.name;
+          var lat = country.geometry.coordinates[0][0][1]; // Adjust based on your JSON structure
+          var lng = country.geometry.coordinates[0][0][0]; // Adjust based on your JSON structure
+
+          options += `<option value="${countryCode}" data-latitude="${lat}" data-longitude="${lng}">${countryName}</option>`;
+      });
+      $('#countrySelect').html(options);
+  }).fail(function() {
+      console.error('Error loading country borders JSON file.');
   });
 }
+
+// $(document).ready(function () {
+//   // Initialize the map
+//   map = L.map("map", {
+//     layers: [streets]
+//   }).setView([54.5, -4], 6);
+
+//   layerControl = L.control.layers(basemaps).addTo(map);
+
+//   infoBtn.addTo(map);
+//   weatherBtn.addTo(map);
+//   newsBtn.addTo(map);
+//   wikiBtn.addTo(map);
+//   exchangeBtn.addTo(map);
+//   weatherBtn.addTo(map);
+
+//   // Populate the country dropdown
+//   populateCountryDropdown();
+//   getExchangeRates();
+
+//   // Add change event listener to the country dropdown
+//   $('#countrySelect').change(function () {
+//     const selectedCountryCode = $(this).val();
+//     const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
+//     const lat = selectedOption.data('latitude');
+//     const lng = selectedOption.data('longitude');
+//     const countryName = selectedOption.text();
+
+//     updateWeatherModal(countryName);
+//     updateInfoModal(countryName, selectedOption);
+//     fetchWikipediaData(countryName);
+//     fetchNewsData(selectedCountryCode);
+//   });
+
+//   $('#amount').on('input', convertCurrency);
+//   $('#exchangeRatesSelect').on('change', convertCurrency);
+// });
+
+
+
+// function populateCountryDropdown() {
+
+//   $.ajax({
+//     url: 'libs/php/getCountryInfo.php',
+//     method: 'GET',
+//     success: function (data) {
+//       if (data.status.code === "200") {
+//         var options = '';
+//         data.data.forEach(function (country) {
+//           options += `<option value="${country.countryCode}" > ${country.countryName}</option>`;
+//         });
+//         $('#countrySelect').html(options);
+//       } else {
+//         console.error('Error fetching country data:', data.status.description);
+//       }
+//     },
+//     error: function (err) {
+//       console.log("Error: ", err);
+//     }
+//   });
+// }
 
 function updateWeatherModal(countryName) {
   var encodedCountryName = encodeURIComponent(countryName);
