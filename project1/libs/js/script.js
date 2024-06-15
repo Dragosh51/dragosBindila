@@ -53,7 +53,7 @@ var exchangeBtn = L.easyButton("fa-money-bill-wave fa-xl", function (btn, map) {
 $(document).ready(function () {
   // Initialize the map
   map = L.map("map", {
-      layers: [streets]
+    layers: [streets]
   }).setView([54.5, -4], 6);
 
   layerControl = L.control.layers(basemaps).addTo(map);
@@ -71,16 +71,19 @@ $(document).ready(function () {
 
   // Add change event listener to the country dropdown
   $('#countrySelect').change(function () {
-      const selectedCountryCode = $(this).val();
-      const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
-      const lat = selectedOption.data('latitude');
-      const lng = selectedOption.data('longitude');
-      const countryName = selectedOption.text();
+    const selectedCountryCode = $(this).val();
+    const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
+    const lat = selectedOption.data('latitude');
+    const lng = selectedOption.data('longitude');
+    const countryName = selectedOption.text();
 
-      updateWeatherModal(countryName);
-      updateInfoModal(countryName, selectedOption);
-      fetchWikipediaData(countryName);
-      fetchNewsData(selectedCountryCode);
+    // Set the view to the selected country's coordinates
+    map.setView([lat, lng], 5); // Adjust the zoom level as needed
+
+    updateWeatherModal(countryName);
+    updateInfoModal(countryName, selectedOption);
+    fetchWikipediaData(countryName);
+    fetchNewsData(selectedCountryCode);
   });
 
   $('#amount').on('input', convertCurrency);
@@ -88,21 +91,21 @@ $(document).ready(function () {
 });
 
 function populateCountryDropdown() {
-  $.getJSON('countryBorders.geo.json', function(data) {
-      console.log('Loaded country borders:', data);
+  $.getJSON('countryBorders.geo.json', function (data) {
+    console.log('Loaded country borders:', data);
 
-      var options = '';
-      data.features.forEach(function (country) {
-          var countryCode = country.properties.iso_a2;
-          var countryName = country.properties.name;
-          var lat = country.geometry.coordinates[0][0][1]; // Adjust based on your JSON structure
-          var lng = country.geometry.coordinates[0][0][0]; // Adjust based on your JSON structure
+    var options = '';
+    data.features.forEach(function (country) {
+      var countryCode = country.properties.iso_a2;
+      var countryName = country.properties.name;
+      var lat = country.geometry.coordinates[0][0][1]; // Adjust based on your JSON structure
+      var lng = country.geometry.coordinates[0][0][0]; // Adjust based on your JSON structure
 
-          options += `<option value="${countryCode}" data-latitude="${lat}" data-longitude="${lng}">${countryName}</option>`;
-      });
-      $('#countrySelect').html(options);
-  }).fail(function() {
-      console.error('Error loading country borders JSON file.');
+      options += `<option value="${countryCode}" data-latitude="${lat}" data-longitude="${lng}">${countryName}</option>`;
+    });
+    $('#countrySelect').html(options);
+  }).fail(function () {
+    console.error('Error loading country borders JSON file.');
   });
 }
 
@@ -362,29 +365,29 @@ function fetchNewsData(countryCode) {
   console.log('Country code news', countryCode)
 
   $.ajax({
-      url: 'libs/php/getNewsData.php',
-      method: 'GET',
-      data: { q: encodedCountryCode },
-      success: function (data) {
-          console.log('API Response:', data);
+    url: 'libs/php/getNewsData.php',
+    method: 'GET',
+    data: { q: encodedCountryCode },
+    success: function (data) {
+      console.log('API Response:', data);
 
-          if (data.status.code === "200") {
-              var newsContent = '';
-              data.data.forEach(function (article) {
-                  newsContent += `<h5>${article.title}</h5>`;
-                  newsContent += `<p>${article.publishedAt}</p>`;
-                  newsContent += `<a href="${article.url}" target="_blank">Read more</a><hr>`;
-              });
-              $('#newsModal .modal-body').html(newsContent);
-              
-          } else {
-              console.error('Error fetching news data:', data.message);
-              $('#newsModal .modal-body').html('<p>Error fetching news data.</p>');
-          }
-      },
-      error: function (xhr, status, error) {
-          console.error("AJAX Error:", status, error);
-          $('#newsModal .modal-body').html('<p>Error fetching news data.</p>');
+      if (data.status.code === "200") {
+        var newsContent = '';
+        data.data.forEach(function (article) {
+          newsContent += `<h5>${article.title}</h5>`;
+          newsContent += `<p>${article.publishedAt}</p>`;
+          newsContent += `<a href="${article.url}" target="_blank">Read more</a><hr>`;
+        });
+        $('#newsModal .modal-body').html(newsContent);
+
+      } else {
+        console.error('Error fetching news data:', data.message);
+        $('#newsModal .modal-body').html('<p>Error fetching news data.</p>');
       }
+    },
+    error: function (xhr, status, error) {
+      console.error("AJAX Error:", status, error);
+      $('#newsModal .modal-body').html('<p>Error fetching news data.</p>');
+    }
   });
 }
