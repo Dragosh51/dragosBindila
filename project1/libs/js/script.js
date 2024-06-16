@@ -2,7 +2,7 @@
 // GLOBAL DECLARATIONS
 // ---------------------------------------------------------
 
-var map;
+var map, countryBorders, countryBordersLayer;
 
 // tile layers
 
@@ -51,12 +51,25 @@ var exchangeBtn = L.easyButton("fa-money-bill-wave fa-xl", function (btn, map) {
 // initialise and add controls once DOM is ready
 
 $(document).ready(function () {
-  // Initialize the map
+  initializeMap();
+  setupEventListeners();
+});
+
+function initializeMap() {
   map = L.map("map", {
-    layers: [streets]
+    layers: [L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
+    })]
   }).setView([54.5, -4], 6);
 
-  layerControl = L.control.layers(basemaps).addTo(map);
+  var layerControl = L.control.layers({
+    "Streets": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
+    }),
+    "Satellite": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+    })
+  }).addTo(map);
 
   infoBtn.addTo(map);
   weatherBtn.addTo(map);
@@ -64,12 +77,11 @@ $(document).ready(function () {
   wikiBtn.addTo(map);
   exchangeBtn.addTo(map);
   weatherBtn.addTo(map);
+}
 
-  // Populate the country dropdown
+function setupEventListeners() {
   populateCountryDropdown();
-  getExchangeRates();
 
-  // Add change event listener to the country dropdown
   $('#countrySelect').change(function () {
     const selectedCountryCode = $(this).val();
     const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
@@ -80,6 +92,20 @@ $(document).ready(function () {
     // Set the view to the selected country's coordinates
     map.setView([lat, lng], 5); // Adjust the zoom level as needed
 
+    if (countryBordersLayer) {
+      map.removeLayer(countryBordersLayer);
+    }
+
+    const selectedCountry = countryBorders.features.find(feature => feature.properties.iso_a2 === selectedCountryCode);
+    countryBordersLayer = L.geoJSON(selectedCountry, {
+      style: {
+        color: 'blue',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.5
+      }
+    }).addTo(map);
+
     updateWeatherModal(countryName);
     updateInfoModal(countryName, selectedOption);
     fetchWikipediaData(countryName);
@@ -88,11 +114,12 @@ $(document).ready(function () {
 
   $('#amount').on('input', convertCurrency);
   $('#exchangeRatesSelect').on('change', convertCurrency);
-});
+}
 
 function populateCountryDropdown() {
   $.getJSON('countryBorders.geo.json', function (data) {
     console.log('Loaded country borders:', data);
+    countryBorders = data;
 
     var options = '';
     data.features.forEach(function (country) {
@@ -108,6 +135,25 @@ function populateCountryDropdown() {
     console.error('Error loading country borders JSON file.');
   });
 }
+
+// function populateCountryDropdown() {
+//   $.getJSON('countryBorders.geo.json', function (data) {
+//     console.log('Loaded country borders:', data);
+
+//     var options = '';
+//     data.features.forEach(function (country) {
+//       var countryCode = country.properties.iso_a2;
+//       var countryName = country.properties.name;
+//       var lat = country.geometry.coordinates[0][0][1]; // Adjust based on your JSON structure
+//       var lng = country.geometry.coordinates[0][0][0]; // Adjust based on your JSON structure
+
+//       options += `<option value="${countryCode}" data-latitude="${lat}" data-longitude="${lng}">${countryName}</option>`;
+//     });
+//     $('#countrySelect').html(options);
+//   }).fail(function () {
+//     console.error('Error loading country borders JSON file.');
+//   });
+// }
 
 // $(document).ready(function () {
 //   // Initialize the map
@@ -146,29 +192,6 @@ function populateCountryDropdown() {
 //   $('#exchangeRatesSelect').on('change', convertCurrency);
 // });
 
-
-
-// function populateCountryDropdown() {
-
-//   $.ajax({
-//     url: 'libs/php/getCountryInfo.php',
-//     method: 'GET',
-//     success: function (data) {
-//       if (data.status.code === "200") {
-//         var options = '';
-//         data.data.forEach(function (country) {
-//           options += `<option value="${country.countryCode}" > ${country.countryName}</option>`;
-//         });
-//         $('#countrySelect').html(options);
-//       } else {
-//         console.error('Error fetching country data:', data.status.description);
-//       }
-//     },
-//     error: function (err) {
-//       console.log("Error: ", err);
-//     }
-//   });
-// }
 
 function updateWeatherModal(countryName) {
   var encodedCountryName = encodeURIComponent(countryName);
