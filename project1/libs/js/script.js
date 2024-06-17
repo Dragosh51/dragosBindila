@@ -78,6 +78,8 @@ function initializeMap() {
   exchangeBtn.addTo(map);
   weatherBtn.addTo(map);
 }
+ var lat;
+ var lng;
 
 function setupEventListeners() {
   populateCountryDropdown();
@@ -85,12 +87,13 @@ function setupEventListeners() {
   $('#countrySelect').change(function () {
     const selectedCountryCode = $(this).val();
     const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
-    const lat = selectedOption.data('latitude');
-    const lng = selectedOption.data('longitude');
+    // const lat = selectedOption.data('latitude');
+    // const lng = selectedOption.data('longitude');
     const countryName = selectedOption.text();
-
+    updateInfoModal(countryName, selectedOption);
+    
     // Set the view to the selected country's coordinates
-    map.setView([lat, lng], 5); // Adjust the zoom level as needed
+    // map.setView([lat, lng], 5); // Adjust the zoom level as needed
 
     if (countryBordersLayer) {
       map.removeLayer(countryBordersLayer);
@@ -107,7 +110,7 @@ function setupEventListeners() {
     }).addTo(map);
 
     updateWeatherModal(countryName);
-    updateInfoModal(countryName, selectedOption);
+    // updateInfoModal(countryName, selectedOption);
     fetchWikipediaData(countryName);
     fetchNewsData(selectedCountryCode);
   });
@@ -319,7 +322,9 @@ function updateInfoModal(countryName, selectedOption) {
       console.log('Response data:', data);
       if (data.status && data.status.code === "200") {
         var results = data.data.results[0]; // Assuming the first result is the most relevant
-
+        lat = results.geometry.lat;
+        lng = results.geometry.lng;
+        map.setView([lat, lng], 5);
         var countryData = {
           countryCode: selectedOption.val(),
           countryName: selectedOption.text(),
