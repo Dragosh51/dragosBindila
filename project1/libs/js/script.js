@@ -53,6 +53,7 @@ var exchangeBtn = L.easyButton("fa-money-bill-wave fa-xl", function (btn, map) {
 $(document).ready(function () {
   initializeMap();
   setupEventListeners();
+  getExchangeRates();
 });
 
 function initializeMap() {
@@ -78,8 +79,9 @@ function initializeMap() {
   exchangeBtn.addTo(map);
   weatherBtn.addTo(map);
 }
- var lat;
- var lng;
+var lat;
+var lng;
+var selectedCurrencyCode = '';
 
 function setupEventListeners() {
   populateCountryDropdown();
@@ -87,13 +89,9 @@ function setupEventListeners() {
   $('#countrySelect').change(function () {
     const selectedCountryCode = $(this).val();
     const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
-    // const lat = selectedOption.data('latitude');
-    // const lng = selectedOption.data('longitude');
     const countryName = selectedOption.text();
+
     updateInfoModal(countryName, selectedOption);
-    
-    // Set the view to the selected country's coordinates
-    // map.setView([lat, lng], 5); // Adjust the zoom level as needed
 
     if (countryBordersLayer) {
       map.removeLayer(countryBordersLayer);
@@ -110,7 +108,6 @@ function setupEventListeners() {
     }).addTo(map);
 
     updateWeatherModal(countryName);
-    // updateInfoModal(countryName, selectedOption);
     fetchWikipediaData(countryName);
     fetchNewsData(selectedCountryCode);
   });
@@ -124,76 +121,32 @@ function populateCountryDropdown() {
     console.log('Loaded country borders:', data);
     countryBorders = data;
 
-    var options = '';
-    data.features.forEach(function (country) {
-      var countryCode = country.properties.iso_a2;
-      var countryName = country.properties.name;
-      var lat = country.geometry.coordinates[0][0][1]; // Adjust based on your JSON structure
-      var lng = country.geometry.coordinates[0][0][0]; // Adjust based on your JSON structure
-
-      options += `<option value="${countryCode}" data-latitude="${lat}" data-longitude="${lng}">${countryName}</option>`;
+    var countries = data.features.map(function (country) {
+      return {
+        code: country.properties.iso_a2,
+        name: country.properties.name,
+        lat: country.geometry.coordinates[0][0][1], // Adjust based on your JSON structure
+        lng: country.geometry.coordinates[0][0][0]  // Adjust based on your JSON structure
+      };
     });
+
+    // Sort countries alphabetically by name
+    countries.sort(function (a, b) {
+      return a.name.localeCompare(b.name);
+    });
+
+    var options = '';
+    countries.forEach(function (country) {
+      options += `<option value="${country.code}" data-latitude="${country.lat}" data-longitude="${country.lng}">${country.name}</option>`;
+    });
+
     $('#countrySelect').html(options);
   }).fail(function () {
     console.error('Error loading country borders JSON file.');
   });
 }
 
-// function populateCountryDropdown() {
-//   $.getJSON('countryBorders.geo.json', function (data) {
-//     console.log('Loaded country borders:', data);
 
-//     var options = '';
-//     data.features.forEach(function (country) {
-//       var countryCode = country.properties.iso_a2;
-//       var countryName = country.properties.name;
-//       var lat = country.geometry.coordinates[0][0][1]; // Adjust based on your JSON structure
-//       var lng = country.geometry.coordinates[0][0][0]; // Adjust based on your JSON structure
-
-//       options += `<option value="${countryCode}" data-latitude="${lat}" data-longitude="${lng}">${countryName}</option>`;
-//     });
-//     $('#countrySelect').html(options);
-//   }).fail(function () {
-//     console.error('Error loading country borders JSON file.');
-//   });
-// }
-
-// $(document).ready(function () {
-//   // Initialize the map
-//   map = L.map("map", {
-//     layers: [streets]
-//   }).setView([54.5, -4], 6);
-
-//   layerControl = L.control.layers(basemaps).addTo(map);
-
-//   infoBtn.addTo(map);
-//   weatherBtn.addTo(map);
-//   newsBtn.addTo(map);
-//   wikiBtn.addTo(map);
-//   exchangeBtn.addTo(map);
-//   weatherBtn.addTo(map);
-
-//   // Populate the country dropdown
-//   populateCountryDropdown();
-//   getExchangeRates();
-
-//   // Add change event listener to the country dropdown
-//   $('#countrySelect').change(function () {
-//     const selectedCountryCode = $(this).val();
-//     const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
-//     const lat = selectedOption.data('latitude');
-//     const lng = selectedOption.data('longitude');
-//     const countryName = selectedOption.text();
-
-//     updateWeatherModal(countryName);
-//     updateInfoModal(countryName, selectedOption);
-//     fetchWikipediaData(countryName);
-//     fetchNewsData(selectedCountryCode);
-//   });
-
-//   $('#amount').on('input', convertCurrency);
-//   $('#exchangeRatesSelect').on('change', convertCurrency);
-// });
 
 
 function updateWeatherModal(countryName) {
@@ -309,6 +262,12 @@ function convertCurrency() {
   $('#result').val(convertedAmount.toFixed(2) + ' ' + currency);
 }
 
+function updateCurrencyDropdown(currencyCode) {
+  if (currencyCode) {
+    $('#exchangeRatesSelect').val($(`#exchangeRatesSelect option[data-currency="${currencyCode}"]`).val());
+  }
+}
+
 function updateInfoModal(countryName, selectedOption) {
   // Encode the countryName
   var encodedCountryName = encodeURIComponent(countryName);
@@ -317,11 +276,11 @@ function updateInfoModal(countryName, selectedOption) {
   $.ajax({
     url: 'libs/php/getInfo.php',
     method: 'GET',
-    data: { q: encodedCountryName }, // Use the encoded countryName
+    data: { q: encodedCountryName },
     success: function (data) {
       console.log('Response data:', data);
       if (data.status && data.status.code === "200") {
-        var results = data.data.results[0]; // Assuming the first result is the most relevant
+        var results = data.data.results[0];
         lat = results.geometry.lat;
         lng = results.geometry.lng;
         map.setView([lat, lng], 5);
@@ -329,12 +288,14 @@ function updateInfoModal(countryName, selectedOption) {
           countryCode: selectedOption.val(),
           countryName: selectedOption.text(),
           carOrientation: results.annotations.roadinfo.drive_on,
-          capital: results.components.state || 'Unknown', // Assuming state as capital
-          currency: results.annotations.currency.name, // Replace with actual population data if available
-          timeZone: results.annotations.timezone.name, // Replace with actual area data if available
+          capital: results.components.state || 'Unknown',
+          currency: results.annotations.currency.name,
+          timeZone: results.annotations.timezone.name,
           continent: results.components.continent,
-          postal: 'Unknown' // Replace with actual postal code format if available
+          postal: 'Unknown'
         };
+
+        selectedCurrencyCode = results.annotations.currency.iso_code;
 
         // Combine country info into one modal content
         var countryContent = '<table class="table table-striped">';
@@ -351,6 +312,8 @@ function updateInfoModal(countryName, selectedOption) {
         countryContent += '</table>';
 
         $('#infoModal .modal-body').html(countryContent);
+
+        updateCurrencyDropdown(selectedCurrencyCode);
       } else {
         console.error('Error fetching geocode data:', data.status ? data.status.description : 'Unknown error');
       }
@@ -370,12 +333,14 @@ function fetchWikipediaData(query) {
       if (data.status.code === "200") {
         var wikiContent = '';
         data.data.geonames.forEach(function (entry) {
+          // Ensure the URL has a protocol
+          let wikipediaUrl = entry.wikipediaUrl.startsWith('http') ? entry.wikipediaUrl : 'http://' + entry.wikipediaUrl;
           wikiContent += `<h5>${entry.title}</h5>`;
           wikiContent += `<p>${entry.summary}</p>`;
-          wikiContent += `<a href="${entry.wikipediaUrl}" target="_blank">Read more</a><hr>`;
+          wikiContent += `<a href="${wikipediaUrl}" target="_blank">Read more</a><hr>`;
         });
         $('#wikiModal .modal-body').html(wikiContent);
-        // $('#wikiModal').modal('show');
+
       } else {
         console.error('Error fetching Wikipedia data:', data.status.description);
         $('#wikiModal .modal-body').html('<p>Error fetching Wikipedia data.</p>');
