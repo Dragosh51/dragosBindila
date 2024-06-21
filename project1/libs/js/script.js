@@ -54,34 +54,56 @@ $(document).ready(function () {
   initializeMap();
   setupEventListeners();
   getExchangeRates();
+  loadAirports();
 });
+
+var airportsData = [];
+var citiesData = [];
+var airportMarkers = L.markerClusterGroup();
+var cityMarkers = L.markerClusterGroup();
+var map;
+var countryBorders;
+var countryBordersLayer;
 
 function initializeMap() {
   map = L.map("map", {
-    layers: [L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
-      attribution: "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
-    })]
+    layers: [streets] // Default layer
   }).setView([54.5, -4], 6);
 
-  var layerControl = L.control.layers({
-    "Streets": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
-      attribution: "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
-    }),
-    "Satellite": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-      attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
-    })
-  }).addTo(map);
+  var layerControl = L.control.layers(basemaps, null, { collapsed: false }).addTo(map);
+
+  var checkboxControl = L.control({ position: 'topright' });
+  checkboxControl.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'info legend');
+    div.innerHTML = '<label><input type="checkbox" id="airportCheckbox"> Show Airports</label><br>' +
+      '<label><input type="checkbox" id="cityCheckbox"> Show Cities</label>';
+
+    L.DomEvent.on(div.querySelector('#airportCheckbox'), 'change', function () {
+      if (this.checked) {
+        updateAirportMarkers($('#countrySelect').val());
+      } else {
+        removeAirportMarkers();
+      }
+    });
+
+    L.DomEvent.on(div.querySelector('#cityCheckbox'), 'change', function () {
+      if (this.checked) {
+        updateCityMarkers($('#countrySelect').val());
+      } else {
+        removeCityMarkers();
+      }
+    });
+
+    return div;
+  };
+  checkboxControl.addTo(map);
 
   infoBtn.addTo(map);
   weatherBtn.addTo(map);
   newsBtn.addTo(map);
   wikiBtn.addTo(map);
   exchangeBtn.addTo(map);
-  weatherBtn.addTo(map);
 }
-var lat;
-var lng;
-var selectedCurrencyCode = '';
 
 function setupEventListeners() {
   populateCountryDropdown();
@@ -110,6 +132,14 @@ function setupEventListeners() {
     updateWeatherModal(countryName);
     fetchWikipediaData(countryName);
     fetchNewsData(selectedCountryCode);
+
+    if ($('#airportCheckbox').is(':checked')) {
+      updateAirportMarkers(selectedCountryCode);
+    }
+
+    if ($('#cityCheckbox').is(':checked')) {
+      updateCityMarkers(selectedCountryCode);
+    }
   });
 
   $('#amount').on('input', convertCurrency);
@@ -145,6 +175,134 @@ function populateCountryDropdown() {
     console.error('Error loading country borders JSON file.');
   });
 }
+
+function loadAirports() {
+  $.ajax({
+    url: 'libs/php/getLocations.php',
+    method: 'GET',
+    data: {
+      q: 'airport',
+      country: ''
+    },
+    success: function (data) {
+      console.log('Loaded airports data:', data);
+      airportsData = data.data.geonames;
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error("Error loading airports data: " + textStatus + " - " + errorThrown);
+      console.log(jqXHR.responseText);
+    }
+  });
+}
+
+function loadCities() {
+  $.ajax({
+    url: 'libs/php/getLocations.php',
+    method: 'GET',
+    data: {
+      q: 'city',
+      country: ''
+    },
+    success: function (data) {
+      console.log('Loaded cities data:', data);
+      citiesData = data.data.geonames;
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error("Error loading cities data: " + textStatus + " - " + errorThrown);
+      console.log(jqXHR.responseText);
+    }
+  });
+}
+
+function addAirportMarkers() {
+  airportMarkers.clearLayers();
+  airportsData.forEach(function (airport) {
+    var marker = L.marker([airport.lat, airport.lng], {
+      icon: L.divIcon({
+        html: '<i class="fas fa-plane" style="color: blue; font-size: 24px;"></i>',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      })
+    }).bindPopup(`<b>${airport.name}</b><br>${airport.countryName}`);
+    airportMarkers.addLayer(marker);
+  });
+  map.addLayer(airportMarkers);
+}
+
+function removeAirportMarkers() {
+  map.removeLayer(airportMarkers);
+}
+
+function updateAirportMarkers(countryCode) {
+  removeAirportMarkers();
+  if ($('#airportCheckbox').is(':checked')) {
+    $.ajax({
+      url: 'libs/php/getLocations.php',
+      method: 'GET',
+      data: {
+        q: 'airport',
+        country: countryCode
+      },
+      success: function (data) {
+        console.log('Loaded airports data for country:', data);
+        airportsData = data.data.geonames;
+        addAirportMarkers();
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error("Error loading airports data for country: " + textStatus + " - " + errorThrown);
+        console.log(jqXHR.responseText);
+      }
+    });
+  }
+}
+
+function addCityMarkers() {
+  citiesData.forEach(function (city) {
+    var lat = city.lat;
+    var lng = city.lng;
+
+    var marker = L.marker([city.lat, city.lng], {
+      icon: L.divIcon({
+        html: '<i class="fas fa-building" style="color: green; font-size: 24px;"></i>',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      })
+    }).bindPopup(`<b>${city.name}</b><br>${city.countryName}`);
+
+    cityMarkers.addLayer(marker); // Add each marker individually
+  });
+
+  // Don't add all markers at once, just add the cluster group once outside the loop
+  map.addLayer(cityMarkers); // Add the entire cluster group to the map
+}
+
+function removeCityMarkers() {
+  map.removeLayer(cityMarkers);
+}
+
+function updateCityMarkers(countryCode) {
+  removeCityMarkers();
+  if ($('#cityCheckbox').is(':checked')) {
+    $.ajax({
+      url: 'libs/php/getLocations.php',
+      method: 'GET',
+      data: {
+        q: 'city',
+        country: countryCode
+      },
+      success: function (data) {
+        console.log('Loaded cities data for country:', data);
+        citiesData = data.data.geonames;
+        addCityMarkers();
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error("Error loading cities data for country: " + textStatus + " - " + errorThrown);
+        console.log(jqXHR.responseText);
+      }
+    });
+  }
+}
+
 
 
 
