@@ -51,10 +51,106 @@ var exchangeBtn = L.easyButton("fa-money-bill-wave fa-xl", function (btn, map) {
 // initialise and add controls once DOM is ready
 
 $(document).ready(function () {
-  initializeMap();
-  setupEventListeners();
-  getExchangeRates();
-  loadAirports();
+  // Start fetching user's location immediately
+  var locationPromise = new Promise(function (resolve, reject) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        });
+        $('#preloader').fadeOut('slow', function () {
+          
+    
+          // Handle the location data once it's ready
+          locationPromise.then(function (coords) {
+            var lat = coords.lat;
+            var lng = coords.lng;
+    
+            // Reverse geocode using OpenCage API
+            $.getJSON(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lng}&key=54edf32071d4421eae034f79c1a135a5`, function (data) {
+              var countryCode = data.results[0].components.country_code.toUpperCase();
+              var countryName = data.results[0].components.country;
+    
+              $('#countrySelect').val(countryCode).change(); // Select the country in the dropdown
+    
+              // Update info modal and set map view
+              var selectedOption = $(`#countrySelect option[value="${countryCode}"]`);
+              updateInfoModal(countryName, selectedOption);
+              updateWeatherModal(countryName);
+              fetchWikipediaData(countryCode);
+              fetchNewsData(countryCode);
+    
+              // Initialize the app
+              initializeMap();
+              setupEventListeners();
+              getExchangeRates();
+              loadAirports();
+              loadCities();
+            });
+          }).catch(function (error) {
+            console.error(error);
+    
+            // Initialize the app without user location
+            initializeMap();
+            setupEventListeners();
+            getExchangeRates();
+            loadAirports();
+            loadCities();
+          });
+          $(this).remove(); // Remove preloader element after fade out
+        });
+      }, function (error) {
+        reject("Geolocation error: " + error.message);
+      });
+    } else {
+      reject("Geolocation is not supported by this browser.");
+    }
+  });
+
+  // Show preloader for 1.5 seconds
+  // setTimeout(function () {
+  //   $('#preloader').fadeOut('slow', function () {
+  //     $(this).remove(); // Remove preloader element after fade out
+
+  //     // Handle the location data once it's ready
+  //     locationPromise.then(function (coords) {
+  //       var lat = coords.lat;
+  //       var lng = coords.lng;
+
+  //       // Reverse geocode using OpenCage API
+  //       $.getJSON(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lng}&key=54edf32071d4421eae034f79c1a135a5`, function (data) {
+  //         var countryCode = data.results[0].components.country_code.toUpperCase();
+  //         var countryName = data.results[0].components.country;
+
+  //         $('#countrySelect').val(countryCode).change(); // Select the country in the dropdown
+
+  //         // Update info modal and set map view
+  //         var selectedOption = $(`#countrySelect option[value="${countryCode}"]`);
+  //         updateInfoModal(countryName, selectedOption);
+  //         updateWeatherModal(countryName);
+  //         fetchWikipediaData(countryCode);
+  //         fetchNewsData(countryCode);
+
+  //         // Initialize the app
+  //         initializeMap();
+  //         setupEventListeners();
+  //         getExchangeRates();
+  //         loadAirports();
+  //         loadCities();
+  //       });
+  //     }).catch(function (error) {
+  //       console.error(error);
+
+  //       // Initialize the app without user location
+  //       initializeMap();
+  //       setupEventListeners();
+  //       getExchangeRates();
+  //       loadAirports();
+  //       loadCities();
+  //     });
+  //   });
+  // }, 4000); // 1.5 seconds
 });
 
 var airportsData = [];
@@ -309,6 +405,7 @@ function updateCityMarkers(countryCode) {
 
 function updateWeatherModal(countryName) {
   var encodedCountryName = encodeURIComponent(countryName);
+  console.log("COUNTRY NAME", encodedCountryName)
 
   $.ajax({
     url: 'libs/php/getWeatherInfo.php',
@@ -541,4 +638,37 @@ function fetchNewsData(countryCode) {
       $('#newsModal .modal-body').html('<p>Error fetching news data.</p>');
     }
   });
+}
+
+function getLocationAndSelectCountry() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      var lat = position.coords.latitude;
+      var lng = position.coords.longitude;
+
+      $.ajax({
+        url: 'libs/php/getCountryCode.php',
+        method: 'GET',
+        data: {
+          lat: lat,
+          lng: lng
+        },
+        success: function (data) {
+          if (data.status.code === 200) {
+            var countryCode = data.data.countryCode;
+            $('#countrySelect').val(countryCode).change();
+          } else {
+            console.error('Error fetching country code:', data.status.description);
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error('Error fetching country code:', error);
+        }
+      });
+    }, function (error) {
+      console.error('Error getting location:', error);
+    });
+  } else {
+    console.error('Geolocation is not supported by this browser.');
+  }
 }
