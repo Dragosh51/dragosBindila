@@ -59,47 +59,6 @@ $(document).ready(function () {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         });
-        $('#preloader').fadeOut('slow', function () {
-          
-    
-          // Handle the location data once it's ready
-          locationPromise.then(function (coords) {
-            var lat = coords.lat;
-            var lng = coords.lng;
-    
-            // Reverse geocode using OpenCage API
-            $.getJSON(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lng}&key=54edf32071d4421eae034f79c1a135a5`, function (data) {
-              var countryCode = data.results[0].components.country_code.toUpperCase();
-              var countryName = data.results[0].components.country;
-    
-              $('#countrySelect').val(countryCode).change(); // Select the country in the dropdown
-    
-              // Update info modal and set map view
-              var selectedOption = $(`#countrySelect option[value="${countryCode}"]`);
-              updateInfoModal(countryName, selectedOption);
-              updateWeatherModal(countryName);
-              fetchWikipediaData(countryCode);
-              fetchNewsData(countryCode);
-    
-              // Initialize the app
-              initializeMap();
-              setupEventListeners();
-              getExchangeRates();
-              loadAirports();
-              loadCities();
-            });
-          }).catch(function (error) {
-            console.error(error);
-    
-            // Initialize the app without user location
-            initializeMap();
-            setupEventListeners();
-            getExchangeRates();
-            loadAirports();
-            loadCities();
-          });
-          $(this).remove(); // Remove preloader element after fade out
-        });
       }, function (error) {
         reject("Geolocation error: " + error.message);
       });
@@ -108,50 +67,103 @@ $(document).ready(function () {
     }
   });
 
-  // Show preloader for 1.5 seconds
-  // setTimeout(function () {
-  //   $('#preloader').fadeOut('slow', function () {
-  //     $(this).remove(); // Remove preloader element after fade out
+  // Show the preloader initially
+  $('#preloader').show();
 
-  //     // Handle the location data once it's ready
-  //     locationPromise.then(function (coords) {
-  //       var lat = coords.lat;
-  //       var lng = coords.lng;
+  // Start loading process
+  locationPromise.then(function (coords) {
+    var lat = coords.lat;
+    var lng = coords.lng;
 
-  //       // Reverse geocode using OpenCage API
-  //       $.getJSON(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lng}&key=54edf32071d4421eae034f79c1a135a5`, function (data) {
-  //         var countryCode = data.results[0].components.country_code.toUpperCase();
-  //         var countryName = data.results[0].components.country;
+    // Reverse geocode using OpenCage API
+    $.getJSON(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lng}&key=54edf32071d4421eae034f79c1a135a5`, function (data) {
+      var countryCode = data.results[0].components.country_code.toUpperCase();
+      var countryName = data.results[0].components.country;
 
-  //         $('#countrySelect').val(countryCode).change(); // Select the country in the dropdown
+      console.log('Country Code:', countryCode);
+      console.log('Country Name:', countryName);
 
-  //         // Update info modal and set map view
-  //         var selectedOption = $(`#countrySelect option[value="${countryCode}"]`);
-  //         updateInfoModal(countryName, selectedOption);
-  //         updateWeatherModal(countryName);
-  //         fetchWikipediaData(countryCode);
-  //         fetchNewsData(countryCode);
+      // Initialize the app and set up event listeners
+      initializeMap();
+      setupEventListeners();
 
-  //         // Initialize the app
-  //         initializeMap();
-  //         setupEventListeners();
-  //         getExchangeRates();
-  //         loadAirports();
-  //         loadCities();
-  //       });
-  //     }).catch(function (error) {
-  //       console.error(error);
+      // Populate the country dropdown and then set the value and trigger the change event
+      populateCountryDropdown(function () {
+        // Programmatically select the country in the dropdown
+        $('#countrySelect').val(countryCode);
+        console.log('Dropdown value set to:', $('#countrySelect').val());
 
-  //       // Initialize the app without user location
-  //       initializeMap();
-  //       setupEventListeners();
-  //       getExchangeRates();
-  //       loadAirports();
-  //       loadCities();
-  //     });
-  //   });
-  // }, 4000); // 1.5 seconds
+        // Manually trigger the change event
+        $('#countrySelect').trigger('change');
+
+        // Ensure the modals and other updates are triggered
+        updateInfoModal($('#countrySelect option:selected').text(), $('#countrySelect option:selected'));
+        updateWeatherModal($('#countrySelect option:selected').text());
+        fetchWikipediaData(countryCode);
+        fetchNewsData(countryCode);
+
+        // Hide the preloader after everything is loaded
+        $('#preloader').fadeOut('slow', function () {
+          $(this).remove(); // Remove preloader element after fade out
+        });
+      });
+
+      // Load other data
+      getExchangeRates();
+      loadAirports();
+      loadCities();
+    });
+  }).catch(function (error) {
+    console.error(error);
+
+    // Initialize the app without user location
+    initializeMap();
+    setupEventListeners();
+    getExchangeRates();
+    loadAirports();
+    loadCities();
+
+    // Hide the preloader in case of error
+    $('#preloader').fadeOut('slow', function () {
+      $(this).remove(); // Remove preloader element after fade out
+    });
+  });
 });
+
+function populateCountryDropdown(callback) {
+  $.getJSON('countryBorders.geo.json', function (data) {
+    console.log('Loaded country borders:', data);
+    countryBorders = data;
+
+    var countries = data.features.map(function (country) {
+      return {
+        code: country.properties.iso_a2,
+        name: country.properties.name,
+        lat: country.geometry.coordinates[0][0][1], // Adjust based on your JSON structure
+        lng: country.geometry.coordinates[0][0][0]  // Adjust based on your JSON structure
+      };
+    });
+
+    // Sort countries alphabetically by name
+    countries.sort(function (a, b) {
+      return a.name.localeCompare(b.name);
+    });
+
+    var options = '';
+    countries.forEach(function (country) {
+      options += `<option value="${country.code}" data-latitude="${country.lat}" data-longitude="${country.lng}">${country.name}</option>`;
+    });
+
+    $('#countrySelect').html(options);
+
+    // Invoke the callback after populating the dropdown
+    if (typeof callback === 'function') {
+      callback();
+    }
+  }).fail(function () {
+    console.error('Error loading country borders JSON file.');
+  });
+}
 
 var airportsData = [];
 var citiesData = [];
@@ -161,53 +173,16 @@ var map;
 var countryBorders;
 var countryBordersLayer;
 
-function initializeMap() {
-  map = L.map("map", {
-    layers: [streets] // Default layer
-  }).setView([54.5, -4], 6);
 
-  var layerControl = L.control.layers(basemaps, null, { collapsed: false }).addTo(map);
-
-  var checkboxControl = L.control({ position: 'topright' });
-  checkboxControl.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'info legend');
-    div.innerHTML = '<label><input type="checkbox" id="airportCheckbox"> Show Airports</label><br>' +
-      '<label><input type="checkbox" id="cityCheckbox"> Show Cities</label>';
-
-    L.DomEvent.on(div.querySelector('#airportCheckbox'), 'change', function () {
-      if (this.checked) {
-        updateAirportMarkers($('#countrySelect').val());
-      } else {
-        removeAirportMarkers();
-      }
-    });
-
-    L.DomEvent.on(div.querySelector('#cityCheckbox'), 'change', function () {
-      if (this.checked) {
-        updateCityMarkers($('#countrySelect').val());
-      } else {
-        removeCityMarkers();
-      }
-    });
-
-    return div;
-  };
-  checkboxControl.addTo(map);
-
-  infoBtn.addTo(map);
-  weatherBtn.addTo(map);
-  newsBtn.addTo(map);
-  wikiBtn.addTo(map);
-  exchangeBtn.addTo(map);
-}
 
 function setupEventListeners() {
-  populateCountryDropdown();
-
   $('#countrySelect').change(function () {
     const selectedCountryCode = $(this).val();
     const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
     const countryName = selectedOption.text();
+
+    console.log('Country selected:', countryName);
+    console.log('Country code:', selectedCountryCode);
 
     updateInfoModal(countryName, selectedOption);
 
@@ -242,34 +217,43 @@ function setupEventListeners() {
   $('#exchangeRatesSelect').on('change', convertCurrency);
 }
 
-function populateCountryDropdown() {
-  $.getJSON('countryBorders.geo.json', function (data) {
-    console.log('Loaded country borders:', data);
-    countryBorders = data;
+function initializeMap() {
+  map = L.map("map", {
+    layers: [streets] // Default layer
+  }).setView([54.5, -4], 6);
 
-    var countries = data.features.map(function (country) {
-      return {
-        code: country.properties.iso_a2,
-        name: country.properties.name,
-        lat: country.geometry.coordinates[0][0][1], // Adjust based on your JSON structure
-        lng: country.geometry.coordinates[0][0][0]  // Adjust based on your JSON structure
-      };
-    });
+  var airports = L.layerGroup([]);
+  var cities = L.layerGroup([]);
+  var overlayMaps = {
+    "Airports": airports,
+    "Cities": cities
+  };
 
-    // Sort countries alphabetically by name
-    countries.sort(function (a, b) {
-      return a.name.localeCompare(b.name);
-    });
+  var layerControl = L.control.layers(basemaps, overlayMaps, { collapsed: false }).addTo(map);
 
-    var options = '';
-    countries.forEach(function (country) {
-      options += `<option value="${country.code}" data-latitude="${country.lat}" data-longitude="${country.lng}">${country.name}</option>`;
-    });
-
-    $('#countrySelect').html(options);
-  }).fail(function () {
-    console.error('Error loading country borders JSON file.');
+  map.on('overlayadd', function (eventLayer) {
+    if (eventLayer.name === 'Airports') {
+      updateAirportMarkers($('#countrySelect').val());
+    }
+    if (eventLayer.name === 'Cities') {
+      updateCityMarkers($('#countrySelect').val());
+    }
   });
+
+  map.on('overlayremove', function (eventLayer) {
+    if (eventLayer.name === 'Airports') {
+      removeAirportMarkers();
+    }
+    if (eventLayer.name === 'Cities') {
+      removeCityMarkers();
+    }
+  });
+
+  infoBtn.addTo(map);
+  weatherBtn.addTo(map);
+  newsBtn.addTo(map);
+  wikiBtn.addTo(map);
+  exchangeBtn.addTo(map);
 }
 
 function loadAirports() {
@@ -326,30 +310,31 @@ function addAirportMarkers() {
 }
 
 function removeAirportMarkers() {
-  map.removeLayer(airportMarkers);
+  // map.removeLayer(airportMarkers);
+  // console.log('Removing airport markers');
+  airportMarkers.clearLayers();
 }
 
 function updateAirportMarkers(countryCode) {
   removeAirportMarkers();
-  if ($('#airportCheckbox').is(':checked')) {
-    $.ajax({
-      url: 'libs/php/getLocations.php',
-      method: 'GET',
-      data: {
-        q: 'airport',
-        country: countryCode
-      },
-      success: function (data) {
-        console.log('Loaded airports data for country:', data);
-        airportsData = data.data.geonames;
-        addAirportMarkers();
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.error("Error loading airports data for country: " + textStatus + " - " + errorThrown);
-        console.log(jqXHR.responseText);
-      }
-    });
-  }
+  $.ajax({
+    url: 'libs/php/getLocations.php',
+    method: 'GET',
+    data: {
+      q: 'airport',
+      country: countryCode
+    },
+    success: function (data) {
+      console.log('Loaded airports data for country:', data);
+      airportsData = data.data.geonames;
+      addAirportMarkers();
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error("Error loading airports data for country: " + textStatus + " - " + errorThrown);
+      console.log(jqXHR.responseText);
+    }
+  });
+  console.log('Updating airport markers for', countryCode);
 }
 
 function addCityMarkers() {
@@ -373,34 +358,32 @@ function addCityMarkers() {
 }
 
 function removeCityMarkers() {
-  map.removeLayer(cityMarkers);
+  // map.removeLayer(cityMarkers);
+  // console.log('Removing city markers');
+  cityMarkers.clearLayers();
 }
 
 function updateCityMarkers(countryCode) {
   removeCityMarkers();
-  if ($('#cityCheckbox').is(':checked')) {
-    $.ajax({
-      url: 'libs/php/getLocations.php',
-      method: 'GET',
-      data: {
-        q: 'city',
-        country: countryCode
-      },
-      success: function (data) {
-        console.log('Loaded cities data for country:', data);
-        citiesData = data.data.geonames;
-        addCityMarkers();
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.error("Error loading cities data for country: " + textStatus + " - " + errorThrown);
-        console.log(jqXHR.responseText);
-      }
-    });
-  }
+  $.ajax({
+    url: 'libs/php/getLocations.php',
+    method: 'GET',
+    data: {
+      q: 'city',
+      country: countryCode
+    },
+    success: function (data) {
+      console.log('Loaded city data for country:', data);
+      citiesData = data.data.geonames;
+      addCityMarkers();
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error("Error loading city data for country: " + textStatus + " - " + errorThrown);
+      console.log(jqXHR.responseText);
+    }
+  });
+  console.log('Updating city markers for', countryCode);
 }
-
-
-
 
 
 function updateWeatherModal(countryName) {
