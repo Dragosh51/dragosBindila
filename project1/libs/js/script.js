@@ -102,6 +102,11 @@ $(document).ready(function () {
         fetchWikipediaData(countryCode);
         fetchNewsData(countryCode);
 
+        // Fetch the currency code and update the exchange rates modal
+        getCurrencyCode(countryCode, function(currencyCode) {
+          updateExchangeRatesModal(currencyCode);
+        });
+
         // Hide the preloader after everything is loaded
         $('#preloader').fadeOut('slow', function () {
           $(this).remove(); // Remove preloader element after fade out
@@ -109,7 +114,6 @@ $(document).ready(function () {
       });
 
       // Load other data
-      getExchangeRates();
       loadAirports();
       loadCities();
     });
@@ -200,7 +204,7 @@ function setupEventListeners() {
       }
     }).addTo(map);
 
-    updateWeatherModal(countryName);
+    updateWeatherModal(selectedCountryCode);
     fetchWikipediaData(countryName);
     fetchNewsData(selectedCountryCode);
 
@@ -385,68 +389,89 @@ function updateCityMarkers(countryCode) {
   console.log('Updating city markers for', countryCode);
 }
 
-
-function updateWeatherModal(countryName) {
-  var encodedCountryName = encodeURIComponent(countryName);
-  console.log("COUNTRY NAME", encodedCountryName)
-
+function updateWeatherModal(countryCode) {
+  // Fetch the capital city of the selected country
   $.ajax({
-    url: 'libs/php/getWeatherInfo.php',
+    url: 'libs/php/getCountryInfo.php',
     method: 'GET',
-    data: { q: encodedCountryName },
-    success: function (data) {
-      console.log('Response data:', data);
-      if (data.status && data.status.code === "200") {
-        var weatherData = data.data;
+    data: { countryCode: countryCode },
+    success: function (countryData) {
+      if (countryData.status && countryData.status.code === "200") {
+        var capitalCity = countryData.data.capital;
+        if (!capitalCity) {
+          console.error('Capital city not found for', countryData.data.countryName);
+          return;
+        }
 
-        // Location info content
-        var locationInfo = `
-                  <div>
-                      <h5>${weatherData.location.country}, ${weatherData.location.name}</h5>
-                  </div>
+        var encodedCityName = encodeURIComponent(capitalCity);
+        console.log("City Name", encodedCityName);
+
+        // Fetch weather data for the capital city
+        $.ajax({
+          url: 'libs/php/getWeatherInfo.php',
+          method: 'GET',
+          data: { q: encodedCityName },
+          success: function (data) {
+            console.log('Response data:', data);
+            if (data.status && data.status.code === "200") {
+              var weatherData = data.data;
+
+              // Location info content
+              var locationInfo = `
+                <div>
+                  <h5>${weatherData.location.country}, ${weatherData.location.name}</h5>
+                </div>
               `;
 
-        // Current weather content
-        var currentWeather = `
-                  <div>
-                      <h5>Today</h5>
-                      <div style="display: flex; align-items: center; justify-content: space-between;">
-                          <p>Overcast</p>
-                          <p>${weatherData.current.temp_c}°C</p>
-                          <img src="https:${weatherData.current.condition.icon}" alt="Weather Icon">
-                      </div>
+              // Current weather content
+              var currentWeather = `
+                <div>
+                  <h5>Today</h5>
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <p>Overcast</p>
+                    <p>${weatherData.current.temp_c}°C</p>
+                    <img src="https:${weatherData.current.condition.icon}" alt="Weather Icon">
                   </div>
+                </div>
               `;
 
-        // Forecast content
-        var forecastContent = '<h5 style="text-align: center;">Forecast</h5>';
-        weatherData.forecast.forecastday.forEach(day => {
-          let date = new Date(day.date);
-          let dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-          let dayNumber = date.getDate();
-          let monthName = date.toLocaleDateString('en-US', { month: 'short' });
-          let formattedDate = `${dayName}, ${dayNumber}${getOrdinalSuffix(dayNumber)} ${monthName}`;
+              // Forecast content
+              var forecastContent = '<h5 style="text-align: center;">Forecast</h5>';
+              weatherData.forecast.forecastday.forEach(day => {
+                let date = new Date(day.date);
+                let dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                let dayNumber = date.getDate();
+                let monthName = date.toLocaleDateString('en-US', { month: 'short' });
+                let formattedDate = `${dayName}, ${dayNumber}${getOrdinalSuffix(dayNumber)} ${monthName}`;
 
-          forecastContent += `
-                      <div style="display: flex; align-items: center; flex-direction: column; border-bottom: 1px solid #ccc; padding: 5px 0;">
-                          <p><strong>${formattedDate}</strong></p>
-                          <div style="display: flex; align-items: center; justify-content: center;">
-                              <p style="margin-right: 10px;">${day.day.avgtemp_c}°C</p>
-                              <img src="https:${day.day.condition.icon}" alt="Forecast Icon">
-                          </div>
-                      </div>
-                  `;
+                forecastContent += `
+                  <div style="display: flex; align-items: center; flex-direction: column; border-bottom: 1px solid #ccc; padding: 5px 0;">
+                    <p><strong>${formattedDate}</strong></p>
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                      <p style="margin-right: 10px;">${day.day.avgtemp_c}°C</p>
+                      <img src="https:${day.day.condition.icon}" alt="Forecast Icon">
+                    </div>
+                  </div>
+                `;
+              });
+
+              $('#locationInfo').html(locationInfo);
+              $('#currentWeather').html(currentWeather);
+              $('#forecastWeather').html(forecastContent);
+            } else {
+              console.error('Error fetching weather data:', data.status ? data.status.description : 'Unknown error');
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('Error fetching weather data:', error);
+          }
         });
-
-        $('#locationInfo').html(locationInfo);
-        $('#currentWeather').html(currentWeather);
-        $('#forecastWeather').html(forecastContent);
       } else {
-        console.error('Error fetching weather data:', data.status ? data.status.description : 'Unknown error');
+        console.error('Error fetching country data:', countryData.status ? countryData.status.description : 'Unknown error');
       }
     },
     error: function (xhr, status, error) {
-      console.error('Error fetching weather data:', error);
+      console.error('Error fetching country data:', error);
     }
   });
 }
@@ -461,6 +486,49 @@ function getOrdinalSuffix(day) {
   }
 }
 
+function getCurrencyCode(countryCode, callback) {
+  $.ajax({
+    url: 'libs/php/getCountryInfo.php',
+    type: 'GET',
+    data: { countryCode: countryCode },
+    success: function (result) {
+      if (result.status.code === "200" && result.data && result.data.currencyCode) {
+        callback(result.data.currencyCode);
+      } else {
+        console.error("Error: " + result.status.description);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error("Error: " + textStatus + " - " + errorThrown);
+      console.log(jqXHR.responseText);
+    }
+  });
+}
+
+function updateExchangeRatesModal(selectedCurrency) {
+  $.ajax({
+    url: "libs/php/getExchangeRates.php",
+    type: 'GET',
+    dataType: 'json',
+    success: function (result) {
+      console.log(result);
+      if (result.status !== 'error') {
+        var options = '';
+        $.each(result.rates, function (currency, rate) {
+          var selected = currency === selectedCurrency ? ' selected' : '';
+          options += `<option value="${rate}" data-currency="${currency}"${selected}>${currency}</option>`;
+        });
+        $('#exchangeRatesSelect').html(options);
+      } else {
+        console.error("Error: " + result.message);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error("Error: " + textStatus + " - " + errorThrown);
+      console.log(jqXHR.responseText);
+    }
+  });
+}
 
 function getExchangeRates() {
   $.ajax({

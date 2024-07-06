@@ -32,7 +32,8 @@ if (isset($data['rates'])) {
     // Return the data as a JSON object
     echo json_encode([
         'status' => 'ok',
-        'rates' => $data['rates']
+        'rates' => $data['rates'],
+        'base' => $data['base']
     ]);
 } else {
     // Return an error if the data is not present

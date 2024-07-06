@@ -4,8 +4,13 @@ error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
-$url = 'http://api.geonames.org/countryInfoJSON?formatted=true&lang=&country=&username=bindil01&style=full';
-// $url = 'https://api.opencagedata.com/geocode/v1/json?q=52.3877830%2C9.7334394&key=54edf32071d4421eae034f79c1a135a5';
+if (!isset($_GET['countryCode'])) {
+    echo json_encode(["status" => ["code" => "400", "name" => "fail", "description" => "Missing parameters"]]);
+    exit;
+}
+
+$countryCode = $_GET['countryCode'];
+$url = 'http://api.geonames.org/countryInfoJSON?formatted=true&lang=&country=' . $countryCode . '&username=bindil01&style=full';
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -28,30 +33,16 @@ if ($decode === null) {
     exit;
 }
 
-$countries = [];
-if (isset($decode['geonames'])) {
-    foreach ($decode['geonames'] as $country) {
-        $countries[] = [
-            'countryCode' => $country['countryCode'],
-            'countryName' => $country['countryName'],
-            // 'capital' => $country['capital'],
-            // 'population' => $country['population'],
-            // 'areaInSqKm' => $country['areaInSqKm'],
-            // 'north' => $country['north'],
-            // 'south' => $country['south'],
-            // 'east' => $country['east'],
-            // 'west' => $country['west'],
-            // 'continentName' => $country['continentName'],
-            // 'postalCodeFormat' => $country['postalCodeFormat']
-        ];
-    }
+$country = null;
+if (isset($decode['geonames'][0])) {
+    $country = $decode['geonames'][0];
 }
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-$output['data'] = $countries;
+$output['data'] = $country;
 
 header('Content-Type: application/json; charset=UTF-8');
 echo json_encode($output);
