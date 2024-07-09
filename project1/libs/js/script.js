@@ -216,7 +216,7 @@ function setupEventListeners() {
       updateCityMarkers(selectedCountryCode);
     }
   });
-
+  $('#amount').val('1');
   $('#amount').on('input', convertCurrency);
   $('#exchangeRatesSelect').on('change', convertCurrency);
 }
@@ -298,29 +298,38 @@ function loadCities() {
   });
 }
 
+function createAirportMarkerIcon() {
+  return L.ExtraMarkers.icon({
+    icon: 'fa-plane', // FontAwesome plane icon
+    markerColor: 'blue', // Marker color
+    shape: 'circle', 
+    prefix: 'fa' 
+  });
+}
+
 function addAirportMarkers() {
   airportMarkers.clearLayers();
+
+  var airportIcon = createAirportMarkerIcon();
+
   airportsData.forEach(function (airport) {
     var marker = L.marker([airport.lat, airport.lng], {
-      icon: L.divIcon({
-        html: '<i class="fas fa-plane" style="color: blue; font-size: 24px;"></i>',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-      })
+      icon: airportIcon
     }).bindPopup(`<b>${airport.name}</b><br>${airport.countryName}`);
+
     airportMarkers.addLayer(marker);
   });
+
   map.addLayer(airportMarkers);
 }
 
 function removeAirportMarkers() {
-  // map.removeLayer(airportMarkers);
-  // console.log('Removing airport markers');
   airportMarkers.clearLayers();
 }
 
 function updateAirportMarkers(countryCode) {
   removeAirportMarkers();
+  
   $.ajax({
     url: 'libs/php/getLocations.php',
     method: 'GET',
@@ -338,37 +347,45 @@ function updateAirportMarkers(countryCode) {
       console.log(jqXHR.responseText);
     }
   });
+
   console.log('Updating airport markers for', countryCode);
 }
 
-function addCityMarkers() {
-  citiesData.forEach(function (city) {
-    var lat = city.lat;
-    var lng = city.lng;
+function createCityMarkerIcon() {
+  return L.ExtraMarkers.icon({
+    icon: 'fa-building', // FontAwesome building icon
+    markerColor: 'green', // Marker color
+    shape: 'circle',
+    prefix: 'fa'
+  });
+}
 
+// Function to add city markers using Leaflet ExtraMarkers
+function addCityMarkers() {
+  cityMarkers.clearLayers(); // Clear existing city markers
+
+  var cityIcon = createCityMarkerIcon();
+
+  citiesData.forEach(function (city) {
     var marker = L.marker([city.lat, city.lng], {
-      icon: L.divIcon({
-        html: '<i class="fas fa-building" style="color: green; font-size: 24px;"></i>',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-      })
+      icon: cityIcon
     }).bindPopup(`<b>${city.name}</b><br>${city.countryName}`);
 
-    cityMarkers.addLayer(marker); // Add each marker individually
+    cityMarkers.addLayer(marker); // Add each marker to the marker cluster group
   });
 
-  // Don't add all markers at once, just add the cluster group once outside the loop
   map.addLayer(cityMarkers); // Add the entire cluster group to the map
 }
 
+// Function to remove city markers
 function removeCityMarkers() {
-  // map.removeLayer(cityMarkers);
-  // console.log('Removing city markers');
-  cityMarkers.clearLayers();
+  cityMarkers.clearLayers(); // Clear all city markers from the map
 }
 
+// Function to update city markers based on country code
 function updateCityMarkers(countryCode) {
-  removeCityMarkers();
+  removeCityMarkers(); // Clear existing city markers
+
   $.ajax({
     url: 'libs/php/getLocations.php',
     method: 'GET',
@@ -378,14 +395,15 @@ function updateCityMarkers(countryCode) {
     },
     success: function (data) {
       console.log('Loaded city data for country:', data);
-      citiesData = data.data.geonames;
-      addCityMarkers();
+      citiesData = data.data.geonames; // Update citiesData with new data
+      addCityMarkers(); // Add updated city markers to the map
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.error("Error loading city data for country: " + textStatus + " - " + errorThrown);
       console.log(jqXHR.responseText);
     }
   });
+
   console.log('Updating city markers for', countryCode);
 }
 
@@ -555,11 +573,11 @@ function getExchangeRates() {
 }
 
 function convertCurrency() {
-  var amount = parseFloat($('#amount').val());
+  var amount = parseFloat($('#amount').val()) || 1;
   var rate = parseFloat($('#exchangeRatesSelect').val());
   var currency = $('#exchangeRatesSelect option:selected').data('currency');
 
-  if (isNaN(amount) || isNaN(rate)) {
+  if (isNaN(rate)) {
     $('#result').val('0');
     return;
   }
@@ -641,9 +659,16 @@ function fetchWikipediaData(query) {
         data.data.geonames.forEach(function (entry) {
           // Ensure the URL has a protocol
           let wikipediaUrl = entry.wikipediaUrl.startsWith('http') ? entry.wikipediaUrl : 'http://' + entry.wikipediaUrl;
+          
+          // Add thumbnail image if present
+          let thumbnailImg = entry.thumbnailImg ? `<img src="${entry.thumbnailImg}" alt="${entry.title} thumbnail" class="img-thumbnail" style="max-width: 100px; margin-right: 10px;">` : '';
+          
+          wikiContent += `<div class="wiki-entry" style="display: flex; align-items: flex-start;">`;
+          wikiContent += `${thumbnailImg}<div>`;
           wikiContent += `<h5>${entry.title}</h5>`;
           wikiContent += `<p>${entry.summary}</p>`;
-          wikiContent += `<a href="${wikipediaUrl}" target="_blank">Read more</a><hr>`;
+          wikiContent += `<a href="${wikipediaUrl}" target="_blank">Read more</a>`;
+          wikiContent += `</div></div><hr>`;
         });
         $('#wikiModal .modal-body').html(wikiContent);
 

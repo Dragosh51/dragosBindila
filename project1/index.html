@@ -11,11 +11,16 @@
     href='https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css'>
   <link rel='stylesheet'
     href='https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css'>
-  <link rel='stylesheet'
-    href='https://cdnjs.cloudflare.com/ajax/libs/leaflet-extra-markers/1.2.1/css/leaflet.extra-markers.min.css'>
+  <link rel="stylesheet" href="./libs/css/leaflet.extra-markers.min.css">
+  <!-- <link rel='stylesheet'
+    href='https://cdnjs.cloudflare.com/ajax/libs/leaflet-extra-markers/1.2.1/css/leaflet.extra-markers.min.css'> -->
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css'>
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css'>
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/Leaflet.EasyButton/2.4.0/easy-button.min.css'>
+  <link rel="apple-touch-icon" sizes="180x180" href="./libs/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./libs/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./libs/img/favicon-16x16.png">
+  <link rel="manifest" href="./libs/img/site.webmanifest">
   <link rel="stylesheet" href="./libs/css/style.css">
 
 </head>
@@ -23,9 +28,9 @@
 <body>
 
   <div id="preloader">
-    <div class="loader">Gazetteer</div>
+    <img src="./libs/img/android-chrome-512x512.png" alt="Loading...">
   </div>
-  
+
   <!-- partial:index.partial.html -->
   <span id="selectContainer">
     <select id="countrySelect" class="form-select shadow-sm">
@@ -445,8 +450,8 @@
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label for="amount" class="form-label">Amount</label>
-            <input type="number" id="amount" class="form-control" placeholder="0" min="0" step="0.01">
+            <label for="amount" class="form-label">Amount (USD)</label>
+            <input type="number" id="amount" class="form-control" value="1" min="0" step="0.01">
           </div>
           <div class="mb-3">
             <label for="currency" class="form-label">Currency</label>
@@ -471,9 +476,11 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.6.1/toastify.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js'></script>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/leaflet-extra-markers/1.2.1/js/leaflet.extra-markers.js'></script>
+  <script src="./libs/js/leaflet.extra-markers.min.js"></script>
+  <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/leaflet-extra-markers/1.2.1/js/leaflet.extra-markers.js'></script> -->
   <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Leaflet.EasyButton/2.4.0/easy-button.min.js'></script>
+
   <script src="./libs/js/script.js"></script>
 
 </body>
