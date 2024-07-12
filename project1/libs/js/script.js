@@ -75,52 +75,77 @@ $(document).ready(function () {
     var lat = coords.lat;
     var lng = coords.lng;
 
-    // Reverse geocode using OpenCage API
-    $.getJSON(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lng}&key=54edf32071d4421eae034f79c1a135a5`, function (data) {
-      var countryCode = data.results[0].components.country_code.toUpperCase();
-      var countryName = data.results[0].components.country;
+    // Make AJAX call to the PHP file
+    $.ajax({
+      url: 'libs/php/getCountryCode.php',
+      method: 'GET',
+      data: {
+        lat: lat,
+        lng: lng
+      },
+      success: function (data) {
+        if (data.status.code === "200") {
+          var countryCode = data.data.country_code;
+          var countryName = data.data.country;
 
-      console.log('Country Code:', countryCode);
-      console.log('Country Name:', countryName);
+          console.log('Country Code:', countryCode);
+          console.log('Country Name:', countryName);
 
-      // Initialize the app and set up event listeners
-      initializeMap();
-      setupEventListeners();
+          // Initialize the app and set up event listeners
+          initializeMap();
+          setupEventListeners();
 
-      // Populate the country dropdown and then set the value and trigger the change event
-      populateCountryDropdown(function () {
-        // Programmatically select the country in the dropdown
-        $('#countrySelect').val(countryCode);
-        console.log('Dropdown value set to:', $('#countrySelect').val());
+          // Populate the country dropdown and then set the value and trigger the change event
+          populateCountryDropdown(function () {
+            // Programmatically select the country in the dropdown
+            $('#countrySelect').val(countryCode);
+            console.log('Dropdown value set to:', $('#countrySelect').val());
 
-        // Manually trigger the change event
-        $('#countrySelect').trigger('change');
+            // Manually trigger the change event
+            $('#countrySelect').trigger('change');
 
-        // Ensure the modals and other updates are triggered
-        updateInfoModal($('#countrySelect option:selected').text(), $('#countrySelect option:selected'));
-        updateWeatherModal($('#countrySelect option:selected').text());
-        fetchWikipediaData(countryCode);
-        fetchNewsData(countryCode);
+            // Ensure the modals and other updates are triggered
+            updateInfoModal($('#countrySelect option:selected').text(), $('#countrySelect option:selected'));
+            updateWeatherModal($('#countrySelect option:selected').text());
+            fetchWikipediaData(countryCode);
+            fetchNewsData(countryCode);
 
-        // Fetch the currency code and update the exchange rates modal
-        getCurrencyCode(countryCode, function(currencyCode) {
-          updateExchangeRatesModal(currencyCode);
-        });
+            // Fetch the currency code and update the exchange rates modal
+            getCurrencyCode(countryCode, function(currencyCode) {
+              updateExchangeRatesModal(currencyCode);
+            });
 
-        // Hide the preloader after everything is loaded
-        $('#preloader').fadeOut('slow', function () {
-          $(this).remove(); // Remove preloader element after fade out
-        });
-      });
+            // Hide the preloader after everything is loaded
+            $('#preloader').fadeOut('slow', function () {
+              $(this).remove(); // Remove preloader element after fade out
+            });
+          });
 
-      // Load other data
-      loadAirports();
-      loadCities();
+          // Load other data
+          loadAirports();
+          loadCities();
+        } else {
+          console.error("Error from PHP API: " + data.status.description);
+
+          // Initialize the app without user location
+          initializeAppWithoutGeolocation();
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error("AJAX error: " + textStatus + " - " + errorThrown);
+
+        // Initialize the app without user location
+        initializeAppWithoutGeolocation();
+      }
     });
   }).catch(function (error) {
     console.error(error);
 
     // Initialize the app without user location
+    initializeAppWithoutGeolocation();
+  });
+
+  function initializeAppWithoutGeolocation() {
     initializeMap();
     setupEventListeners();
     getExchangeRates();
@@ -131,41 +156,61 @@ $(document).ready(function () {
     $('#preloader').fadeOut('slow', function () {
       $(this).remove(); // Remove preloader element after fade out
     });
-  });
+  }
 });
 
 function populateCountryDropdown(callback) {
-  $.getJSON('countryBorders.geo.json', function (data) {
-    console.log('Loaded country borders:', data);
-    countryBorders = data;
+  $.ajax({
+    url: 'libs/php/getCountryBorders.php',
+    method: 'GET',
+    dataType: 'json',
+    success: function (response) {
+      console.log('Full Response from PHP:', response); // Log the entire response
 
-    var countries = data.features.map(function (country) {
-      return {
-        code: country.properties.iso_a2,
-        name: country.properties.name,
-        lat: country.geometry.coordinates[0][0][1], // Adjust based on your JSON structure
-        lng: country.geometry.coordinates[0][0][0]  // Adjust based on your JSON structure
-      };
-    });
+      // Check if the status exists and has a code property
+      if (response.status && response.status.code) {
+        console.log('Response Status Code:', response.status.code); // Log the status code
 
-    // Sort countries alphabetically by name
-    countries.sort(function (a, b) {
-      return a.name.localeCompare(b.name);
-    });
+        if (response.status.code === "200") {
+          var data = response.data;
+          console.log('Loaded country borders:', data);
+          countryBorders = data;
 
-    var options = '';
-    countries.forEach(function (country) {
-      options += `<option value="${country.code}" data-latitude="${country.lat}" data-longitude="${country.lng}">${country.name}</option>`;
-    });
+          var countries = data.features.map(function (country) {
+            return {
+              code: country.properties.iso_a2,
+              name: country.properties.name,
+              lat: country.geometry.coordinates[0][0][1], // Adjust based on your JSON structure
+              lng: country.geometry.coordinates[0][0][0]  // Adjust based on your JSON structure
+            };
+          });
 
-    $('#countrySelect').html(options);
+          // Sort countries alphabetically by name
+          countries.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+          });
 
-    // Invoke the callback after populating the dropdown
-    if (typeof callback === 'function') {
-      callback();
+          var options = '';
+          countries.forEach(function (country) {
+            options += `<option value="${country.code}" data-latitude="${country.lat}" data-longitude="${country.lng}">${country.name}</option>`;
+          });
+
+          $('#countrySelect').html(options);
+
+          // Invoke the callback after populating the dropdown
+          if (typeof callback === 'function') {
+            callback();
+          }
+        } else {
+          console.error('Error from PHP API:', response.status.description);
+        }
+      } else {
+        console.error('Invalid response structure:', response);
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error('AJAX error:', textStatus, ' - ', errorThrown);
     }
-  }).fail(function () {
-    console.error('Error loading country borders JSON file.');
   });
 }
 
