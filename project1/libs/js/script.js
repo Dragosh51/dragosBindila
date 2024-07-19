@@ -41,6 +41,7 @@ var wikiBtn = L.easyButton("fa-w fa-xl", function (btn, map) {
 
 var exchangeBtn = L.easyButton("fa-money-bill-wave fa-xl", function (btn, map) {
   $("#exchangeRatesModal").modal("show");
+  convertCurrency();
 });
 
 
@@ -582,6 +583,7 @@ function updateExchangeRatesModal(selectedCurrency) {
           options += `<option value="${rate}" data-currency="${currency}"${selected}>${currency}</option>`;
         });
         $('#exchangeRatesSelect').html(options);
+        convertCurrency();
       } else {
         console.error("Error: " + result.message);
       }
@@ -606,6 +608,7 @@ function getExchangeRates() {
           options += `<option value="${rate}" data-currency="${currency}">${currency}</option>`;
         });
         $('#exchangeRatesSelect').html(options);
+        convertCurrency();
       } else {
         console.error("Error: " + result.message);
       }
@@ -634,6 +637,7 @@ function convertCurrency() {
 function updateCurrencyDropdown(currencyCode) {
   if (currencyCode) {
     $('#exchangeRatesSelect').val($(`#exchangeRatesSelect option[data-currency="${currencyCode}"]`).val());
+    convertCurrency();
   }
 }
 
