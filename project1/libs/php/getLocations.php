@@ -19,7 +19,7 @@ if (!isset($_GET['q']) || !isset($_GET['country'])) {
 $q = urlencode($_GET['q']);
 $country = urlencode($_GET['country']);
 $username = 'bindil01';
-$url = "http://api.geonames.org/searchJSON?formatted=true&q=$q&country=$country&maxRows=100&lang=es&username=$username&style=full";
+$url = "http://api.geonames.org/searchJSON?formatted=true&q=$q&country=$country&maxRows=100&lang=eng&username=$username&style=full";
 
 
 $ch = curl_init();

@@ -155,58 +155,34 @@ $(document).ready(function () {
 
     // Hide the preloader in case of error
     $('#preloader').fadeOut('slow', function () {
-      $(this).remove(); // Remove preloader element after fade out
+      $(this).remove(); 
     });
   }
 });
 
 function populateCountryDropdown(callback) {
   $.ajax({
-    url: 'libs/php/getCountryBorders.php',
+    url: 'libs/php/getCountryCodesAndNames.php',
     method: 'GET',
     dataType: 'json',
     success: function (response) {
-      console.log('Full Response from PHP:', response); // Log the entire response
+      console.log('Full Response from PHP:', response); 
 
-      // Check if the status exists and has a code property
-      if (response.status && response.status.code) {
-        console.log('Response Status Code:', response.status.code); // Log the status code
+      if (response.status && response.status.code === "200") {
+        var countries = response.data;
 
-        if (response.status.code === "200") {
-          var data = response.data;
-          console.log('Loaded country borders:', data);
-          countryBorders = data;
+        var options = '';
+        countries.forEach(function (country) {
+          options += `<option value="${country.code}">${country.name}</option>`;
+        });
 
-          var countries = data.features.map(function (country) {
-            return {
-              code: country.properties.iso_a2,
-              name: country.properties.name,
-              lat: country.geometry.coordinates[0][0][1], // Adjust based on your JSON structure
-              lng: country.geometry.coordinates[0][0][0]  // Adjust based on your JSON structure
-            };
-          });
+        $('#countrySelect').html(options);
 
-          // Sort countries alphabetically by name
-          countries.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-          });
-
-          var options = '';
-          countries.forEach(function (country) {
-            options += `<option value="${country.code}" data-latitude="${country.lat}" data-longitude="${country.lng}">${country.name}</option>`;
-          });
-
-          $('#countrySelect').html(options);
-
-          // Invoke the callback after populating the dropdown
-          if (typeof callback === 'function') {
-            callback();
-          }
-        } else {
-          console.error('Error from PHP API:', response.status.description);
+        if (typeof callback === 'function') {
+          callback();
         }
       } else {
-        console.error('Invalid response structure:', response);
+        console.error('Error from PHP API:', response.status.description);
       }
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -240,28 +216,53 @@ function setupEventListeners() {
       map.removeLayer(countryBordersLayer);
     }
 
-    const selectedCountry = countryBorders.features.find(feature => feature.properties.iso_a2 === selectedCountryCode);
-    countryBordersLayer = L.geoJSON(selectedCountry, {
-      style: {
-        color: 'blue',
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 0.5
+    $.ajax({
+      url: 'libs/php/getCountryFeature.php',
+      method: 'GET',
+      dataType: 'json',
+      data: { code: selectedCountryCode },
+      success: function (response) {
+        if (response.status && response.status.code === "200") {
+          const selectedCountry = response.data;
+
+          countryBordersLayer = L.geoJSON(selectedCountry, {
+            style: {
+              color: 'blue',
+              weight: 2,
+              opacity: 0.3,
+              fillOpacity: 0.3
+            }
+          }).addTo(map);
+
+          // Use the map.once function to ensure fitBounds is called only once.
+          map.once('zoomend', function () {
+            map.fitBounds(countryBordersLayer.getBounds(), {
+              padding: [20, 20],
+              maxZoom: 10
+            });
+          });
+
+          updateWeatherModal(selectedCountryCode);
+          fetchWikipediaData(countryName);
+          fetchNewsData(selectedCountryCode);
+
+          if ($('#airportCheckbox').is(':checked')) {
+            updateAirportMarkers(selectedCountryCode);
+          }
+
+          if ($('#cityCheckbox').is(':checked')) {
+            updateCityMarkers(selectedCountryCode);
+          }
+        } else {
+          console.error('Error from PHP API:', response.status.description);
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error('AJAX error:', textStatus, ' - ', errorThrown);
       }
-    }).addTo(map);
-
-    updateWeatherModal(selectedCountryCode);
-    fetchWikipediaData(countryName);
-    fetchNewsData(selectedCountryCode);
-
-    if ($('#airportCheckbox').is(':checked')) {
-      updateAirportMarkers(selectedCountryCode);
-    }
-
-    if ($('#cityCheckbox').is(':checked')) {
-      updateCityMarkers(selectedCountryCode);
-    }
+    });
   });
+
   $('#amount').val('1');
   $('#amount').on('input', convertCurrency);
   $('#exchangeRatesSelect').on('change', convertCurrency);
@@ -269,8 +270,8 @@ function setupEventListeners() {
 
 function initializeMap() {
   map = L.map("map", {
-    layers: [streets] // Default layer
-  }).setView([54.5, -4], 6);
+    layers: [streets]
+  });
 
   var airports = L.layerGroup([]);
   var cities = L.layerGroup([]);
