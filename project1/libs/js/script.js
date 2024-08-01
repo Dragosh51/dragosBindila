@@ -115,6 +115,13 @@ $(document).ready(function () {
             getCurrencyCode(countryCode, function(currencyCode) {
               updateExchangeRatesModal(currencyCode);
             });
+            // Automatically load markers
+            updateAirportMarkers(countryCode);
+            updateCityMarkers(countryCode);
+
+            // Set the checkboxes to checked by default
+            $('#airportCheckbox').prop('checked', true);
+            $('#cityCheckbox').prop('checked', true);
 
             // Hide the preloader after everything is loaded
             $('#preloader').fadeOut('slow', function () {
@@ -152,6 +159,17 @@ $(document).ready(function () {
     getExchangeRates();
     loadAirports();
     loadCities();
+
+    // Automatically load markers for the initial view (e.g., default country)
+    const initialCountryCode = $('#countrySelect').val();
+    if (initialCountryCode) {
+      updateAirportMarkers(initialCountryCode);
+      updateCityMarkers(initialCountryCode);
+    }
+
+    // Set the checkboxes to checked by default
+    $('#airportCheckbox').prop('checked', true);
+    $('#cityCheckbox').prop('checked', true);
 
     // Hide the preloader in case of error
     $('#preloader').fadeOut('slow', function () {
@@ -246,13 +264,13 @@ function setupEventListeners() {
           fetchWikipediaData(countryName);
           fetchNewsData(selectedCountryCode);
 
-          if ($('#airportCheckbox').is(':checked')) {
-            updateAirportMarkers(selectedCountryCode);
-          }
+          // Automatically load markers for the selected country
+          updateAirportMarkers(selectedCountryCode);
+          updateCityMarkers(selectedCountryCode);
 
-          if ($('#cityCheckbox').is(':checked')) {
-            updateCityMarkers(selectedCountryCode);
-          }
+          // Ensure checkboxes reflect current state
+          $('#airportCheckbox').prop('checked', true);
+          $('#cityCheckbox').prop('checked', true);
         } else {
           console.error('Error from PHP API:', response.status.description);
         }
@@ -261,6 +279,23 @@ function setupEventListeners() {
         console.error('AJAX error:', textStatus, ' - ', errorThrown);
       }
     });
+  });
+
+  // Event listeners for checkboxes
+  $('#airportCheckbox').change(function () {
+    if ($(this).is(':checked')) {
+      updateAirportMarkers($('#countrySelect').val());
+    } else {
+      removeAirportMarkers();
+    }
+  });
+
+  $('#cityCheckbox').change(function () {
+    if ($(this).is(':checked')) {
+      updateCityMarkers($('#countrySelect').val());
+    } else {
+      removeCityMarkers();
+    }
   });
 
   $('#amount').val('1');
@@ -407,9 +442,8 @@ function createCityMarkerIcon() {
   });
 }
 
-// Function to add city markers using Leaflet ExtraMarkers
 function addCityMarkers() {
-  cityMarkers.clearLayers(); // Clear existing city markers
+  cityMarkers.clearLayers();
 
   var cityIcon = createCityMarkerIcon();
 
@@ -418,21 +452,19 @@ function addCityMarkers() {
       icon: cityIcon
     }).bindPopup(`<b>${city.name}</b><br>${city.countryName}`);
 
-    cityMarkers.addLayer(marker); // Add each marker to the marker cluster group
+    cityMarkers.addLayer(marker);
   });
 
-  map.addLayer(cityMarkers); // Add the entire cluster group to the map
+  map.addLayer(cityMarkers);
 }
 
-// Function to remove city markers
 function removeCityMarkers() {
-  cityMarkers.clearLayers(); // Clear all city markers from the map
+  cityMarkers.clearLayers();
 }
 
-// Function to update city markers based on country code
 function updateCityMarkers(countryCode) {
-  removeCityMarkers(); // Clear existing city markers
-
+  removeCityMarkers();
+  
   $.ajax({
     url: 'libs/php/getLocations.php',
     method: 'GET',
@@ -441,12 +473,12 @@ function updateCityMarkers(countryCode) {
       country: countryCode
     },
     success: function (data) {
-      console.log('Loaded city data for country:', data);
-      citiesData = data.data.geonames; // Update citiesData with new data
-      addCityMarkers(); // Add updated city markers to the map
+      console.log('Loaded cities data for country:', data);
+      citiesData = data.data.geonames;
+      addCityMarkers();
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      console.error("Error loading city data for country: " + textStatus + " - " + errorThrown);
+      console.error("Error loading cities data for country: " + textStatus + " - " + errorThrown);
       console.log(jqXHR.responseText);
     }
   });
