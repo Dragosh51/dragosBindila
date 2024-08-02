@@ -382,10 +382,11 @@ function loadCities() {
 
 function createAirportMarkerIcon() {
   return L.ExtraMarkers.icon({
-    icon: 'fa-plane', // FontAwesome plane icon
-    markerColor: 'blue', // Marker color
-    shape: 'circle', 
-    prefix: 'fa' 
+    prefix: 'fa',
+    icon: 'fa-plane',
+    iconColor: 'black',
+    markerColor: 'white',
+    shape: 'square'
   });
 }
 
@@ -397,7 +398,10 @@ function addAirportMarkers() {
   airportsData.forEach(function (airport) {
     var marker = L.marker([airport.lat, airport.lng], {
       icon: airportIcon
-    }).bindPopup(`<b>${airport.name}</b><br>${airport.countryName}`);
+    }).bindTooltip(airport.name, {
+      direction: "top",
+      sticky: true
+    });
 
     airportMarkers.addLayer(marker);
   });
@@ -435,10 +439,10 @@ function updateAirportMarkers(countryCode) {
 
 function createCityMarkerIcon() {
   return L.ExtraMarkers.icon({
-    icon: 'fa-building', // FontAwesome building icon
-    markerColor: 'green', // Marker color
-    shape: 'circle',
-    prefix: 'fa'
+    prefix: 'fa',
+    icon: 'fa-city',
+    markerColor: 'green',
+    shape: 'square'
   });
 }
 
@@ -450,7 +454,10 @@ function addCityMarkers() {
   citiesData.forEach(function (city) {
     var marker = L.marker([city.lat, city.lng], {
       icon: cityIcon
-    }).bindPopup(`<b>${city.name}</b><br>${city.countryName}`);
+    }).bindTooltip(`<strong>${city.name}</strong>`, {
+      direction: "top",
+      sticky: true
+    });
 
     cityMarkers.addLayer(marker);
   });
@@ -696,7 +703,7 @@ function updateInfoModal(countryName, selectedOption) {
           carOrientation: results.annotations.roadinfo.drive_on,
           capital: results.components.state || 'Unknown',
           currency: results.annotations.currency.name,
-          timeZone: results.annotations.timezone.name,
+          flag: results.annotations.flag,
           continent: results.components.continent,
           postal: 'Unknown'
         };
@@ -706,13 +713,13 @@ function updateInfoModal(countryName, selectedOption) {
         // Combine country info into one modal content
         var countryContent = '<table class="table table-striped">';
         countryContent += '<tr><td class="text-center"><i class="fa-solid fa-car fa-xl text-success"></i></td><td><strong>Driving side:</strong></td><td class="text-end">' + countryData.carOrientation + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-heart fa-xl text-success"></i></td><td><strong>Latitude:</strong></td><td class="text-end">' + results.geometry.lat + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-car fa-xl text-success"></i></td><td><strong>Longitude:</strong></td><td class="text-end">' + results.geometry.lng + '</td></tr>';
+        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-arrows-up-down fa-xl text-success"></i></td><td><strong>Latitude:</strong></td><td class="text-end">' + results.geometry.lat + '</td></tr>';
+        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-arrows-left-right fa-xl text-success"></i></td><td><strong>Longitude:</strong></td><td class="text-end">' + results.geometry.lng + '</td></tr>';
         countryContent += '<tr><td class="text-center"><i class="fa-solid fa-globe fa-xl text-success"></i></td><td><strong>Country:</strong></td><td class="text-end">' + countryData.countryName + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-flag fa-xl text-success"></i></td><td><strong>Country Code:</strong></td><td class="text-end">' + countryData.countryCode + '</td></tr>';
+        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-hashtag fa-xl text-success"></i></td><td><strong>Country Code:</strong></td><td class="text-end">' + countryData.countryCode + '</td></tr>';
         // countryContent += '<tr><td class="text-center"><i class="fa-solid fa-city fa-xl text-success"></i></td><td><strong>Capital:</strong></td><td class="text-end">' + countryData.capital + '</td></tr>';
         countryContent += '<tr><td class="text-center"><i class="fa-solid fa-money-bill-wave fa-xl text-success"></i></td><td><strong>Currency:</strong></td><td class="text-end">' + countryData.currency + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-clock fa-xl text-success"></i></td><td><strong>Time Zone:</strong></td><td class="text-end">' + countryData.timeZone + '</td></tr>';
+        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-flag fa-xl text-success"></i></td><td><strong>Flag:</strong></td><td class="text-end">' + countryData.flag + '</td></tr>';
         countryContent += '<tr><td class="text-center"><i class="fa-solid fa-globe-europe fa-xl text-success"></i></td><td><strong>Continent:</strong></td><td class="text-end">' + countryData.continent + '</td></tr>';
         // countryContent += '<tr><td class="text-center"><i class="fa-solid fa-mail-bulk fa-xl text-success"></i></td><td><strong>Postal Code Format:</strong></td><td class="text-end">' + countryData.postal + '</td></tr>';
         countryContent += '</table>';
