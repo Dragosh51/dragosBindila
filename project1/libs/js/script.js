@@ -660,7 +660,6 @@ function updateCurrencyDropdown(currencyCode) {
 }
 
 function updateInfoModal(countryName, selectedOption) {
-  // Encode the countryName
   var encodedCountryName = encodeURIComponent(countryName);
   console.log('country info opencage', countryName);
 
@@ -675,6 +674,7 @@ function updateInfoModal(countryName, selectedOption) {
         lat = results.geometry.lat;
         lng = results.geometry.lng;
         map.setView([lat, lng], 5);
+
         var countryData = {
           countryCode: selectedOption.val(),
           countryName: selectedOption.text(),
@@ -688,21 +688,18 @@ function updateInfoModal(countryName, selectedOption) {
 
         selectedCurrencyCode = results.annotations.currency.iso_code;
 
-        // Combine country info into one modal content
-        var countryContent = '<table class="table table-striped">';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-car fa-xl text-success"></i></td><td><strong>Driving side:</strong></td><td class="text-end">' + countryData.carOrientation + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-arrows-up-down fa-xl text-success"></i></td><td><strong>Latitude:</strong></td><td class="text-end">' + results.geometry.lat + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-arrows-left-right fa-xl text-success"></i></td><td><strong>Longitude:</strong></td><td class="text-end">' + results.geometry.lng + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-globe fa-xl text-success"></i></td><td><strong>Country:</strong></td><td class="text-end">' + countryData.countryName + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-hashtag fa-xl text-success"></i></td><td><strong>Country Code:</strong></td><td class="text-end">' + countryData.countryCode + '</td></tr>';
-        // countryContent += '<tr><td class="text-center"><i class="fa-solid fa-city fa-xl text-success"></i></td><td><strong>Capital:</strong></td><td class="text-end">' + countryData.capital + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-money-bill-wave fa-xl text-success"></i></td><td><strong>Currency:</strong></td><td class="text-end">' + countryData.currency + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-flag fa-xl text-success"></i></td><td><strong>Flag:</strong></td><td class="text-end">' + countryData.flag + '</td></tr>';
-        countryContent += '<tr><td class="text-center"><i class="fa-solid fa-globe-europe fa-xl text-success"></i></td><td><strong>Continent:</strong></td><td class="text-end">' + countryData.continent + '</td></tr>';
-        // countryContent += '<tr><td class="text-center"><i class="fa-solid fa-mail-bulk fa-xl text-success"></i></td><td><strong>Postal Code Format:</strong></td><td class="text-end">' + countryData.postal + '</td></tr>';
-        countryContent += '</table>';
+        // Update the modal content
+        $('#carOrientation').text(countryData.carOrientation);
+        $('#latitude').text(results.geometry.lat);
+        $('#longitude').text(results.geometry.lng);
+        $('#countryName').text(countryData.countryName);
+        $('#countryCode').text(countryData.countryCode);
+        $('#currency').text(countryData.currency);
+        $('#flag').text(countryData.flag);
+        $('#continent').text(countryData.continent);
 
-        $('#infoModal .modal-body').html(countryContent);
+        // Show the rows in the table
+        $('.info-row').removeClass('d-none');
 
         updateCurrencyDropdown(selectedCurrencyCode);
       } else {
