@@ -518,64 +518,42 @@ function updateWeatherModal(countryCode) {
           success: function (data) {
             console.log('Response data:', data);
             if (data.status && data.status.code === "200") {
-              var weatherData = data.data;
+              var d = data.data;
+              $('#weatherModalLabel').html(d.location.country + ", " + d.location.name);
 
-              // Location info content
-              var locationInfo = `
-                <div>
-                  <h5>${weatherData.location.country}, ${weatherData.location.name}</h5>
-                </div>
-              `;
+              $('#todayConditions').html(d.current.condition.text);
+              $('#todayIcon').attr("src", "https:" + d.current.condition.icon);
+              $('#todayMaxTemp').html(Math.round(d.forecast.forecastday[0].day.maxtemp_c));
+              $('#todayMinTemp').html(Math.round(d.forecast.forecastday[0].day.mintemp_c));
 
-              // Current weather content
-              var currentWeather = `
-                <div>
-                  <h5>Today</h5>
-                  <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <p>Overcast</p>
-                    <p>${weatherData.current.temp_c}°C</p>
-                    <img src="https:${weatherData.current.condition.icon}" alt="Weather Icon">
-                  </div>
-                </div>
-              `;
+              var day1 = d.forecast.forecastday[1];
+              $('#day1Date').text(new Date(day1.date).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' }));
+              $('#day1Icon').attr("src", "https:" + day1.day.condition.icon);
+              $('#day1MinTemp').text(Math.round(day1.day.mintemp_c));
+              $('#day1MaxTemp').text(Math.round(day1.day.maxtemp_c));
 
-              // Forecast content
-              var forecastContent = '<h5 style="text-align: center;">Forecast</h5>';
-              weatherData.forecast.forecastday.forEach(day => {
-                let date = new Date(day.date);
-                let dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-                let dayNumber = date.getDate();
-                let monthName = date.toLocaleDateString('en-US', { month: 'short' });
-                let formattedDate = `${dayName}, ${dayNumber}${getOrdinalSuffix(dayNumber)} ${monthName}`;
+              var day2 = d.forecast.forecastday[2];
+              $('#day2Date').text(new Date(day2.date).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' }));
+              $('#day2Icon').attr("src", "https:" + day2.day.condition.icon);
+              $('#day2MinTemp').text(Math.round(day2.day.mintemp_c));
+              $('#day2MaxTemp').text(Math.round(day2.day.maxtemp_c));
 
-                forecastContent += `
-                  <div style="display: flex; align-items: center; flex-direction: column; border-bottom: 1px solid #ccc; padding: 5px 0;">
-                    <p><strong>${formattedDate}</strong></p>
-                    <div style="display: flex; align-items: center; justify-content: center;">
-                      <p style="margin-right: 10px;">${day.day.avgtemp_c}°C</p>
-                      <img src="https:${day.day.condition.icon}" alt="Forecast Icon">
-                    </div>
-                  </div>
-                `;
-              });
-
-              $('#locationInfo').html(locationInfo);
-              $('#currentWeather').html(currentWeather);
-              $('#forecastWeather').html(forecastContent);
+              $('#lastUpdated').text(d.current.last_updated);
+              $('#pre-load').addClass('fadeOut');
             } else {
-              console.error('Error fetching weather data:', data.status ? data.status.description : 'Unknown error');
+              console.error('Error in weather API response:', data);
             }
           },
-          error: function (xhr, status, error) {
-            console.error('Error fetching weather data:', error);
+          error: function (err) {
+            console.error('Error fetching weather data:', err);
           }
         });
       } else {
-        console.error('Error fetching country data:', countryData.status ? countryData.status.description : 'Unknown error');
+        console.error('Error fetching country data:', countryData);
       }
     },
-    error: function (xhr, status, error) {
-      console.error('Error fetching country data:', error);
+    error: function (err) {
+      console.error('Error in country API request:', err);
     }
   });
 }
@@ -775,7 +753,7 @@ function fetchWikipediaData(query) {
 
 function fetchNewsData(countryCode) {
   var encodedCountryCode = encodeURIComponent(countryCode);
-  console.log('Country code news', countryCode)
+  console.log('Country code news', countryCode);
 
   $.ajax({
     url: 'libs/php/getNewsData.php',
@@ -785,22 +763,34 @@ function fetchNewsData(countryCode) {
       console.log('API Response:', data);
 
       if (data.status.code === "200") {
-        var newsContent = '';
+        var newsContent = $('#newsContent');
+        newsContent.empty(); // Clear any existing content
+
         data.data.forEach(function (article) {
-          newsContent += `<h5>${article.title}</h5>`;
-          newsContent += `<p>${article.publishedAt}</p>`;
-          newsContent += `<a href="${article.url}" target="_blank">Read more</a><hr>`;
+          // Format the published date
+          const publishDate = new Date(article.publishedAt);
+          const options = { day: 'numeric', month: 'long' };
+          const formattedDate = `${publishDate.getHours()}:${String(publishDate.getMinutes()).padStart(2, '0')} ${publishDate.toLocaleDateString('en-US', options)}`;
+
+          // Clone the template and update its content
+          var articleClone = $('.news-article-template').clone().removeClass('d-none news-article-template');
+          articleClone.find('.news-title').text(article.title).attr('href', article.url);
+          articleClone.find('.news-date').text(`Published at: ${formattedDate}`);
+          
+          // Append the cloned article to the news content
+          newsContent.append(articleClone);
         });
-        $('#newsModal .modal-body').html(newsContent);
+
+        $('#pre-load-news').addClass('fadeOut');
 
       } else {
         console.error('Error fetching news data:', data.message);
-        $('#newsModal .modal-body').html('<p>Error fetching news data.</p>');
+        $('#newsContent').html('<p>Error fetching news data.</p>');
       }
     },
     error: function (xhr, status, error) {
       console.error("AJAX Error:", status, error);
-      $('#newsModal .modal-body').html('<p>Error fetching news data.</p>');
+      $('#newsContent').html('<p>Error fetching news data.</p>');
     }
   });
 }
