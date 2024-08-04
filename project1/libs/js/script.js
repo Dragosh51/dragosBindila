@@ -928,7 +928,7 @@ function getExchangeRates() {
     success: function (result) {
       console.log(result);
       if (result.status !== 'error') {
-        var options = '<option value="">Select currency</option>';
+        var options = '';
         $.each(result.rates, function (currency, rate) {
           options += `<option value="${rate}" data-currency="${currency}">${currency}</option>`;
         });
@@ -961,13 +961,8 @@ function convertCurrency() {
 
 function updateCurrencyDropdown(currencyCode) {
   if (currencyCode) {
-    const option = $(`#exchangeRatesSelect option[data-currency="${currencyCode}"]`);
-    if (option.length) {
-      $('#exchangeRatesSelect').val(option.val());
-      convertCurrency();
-    } else {
-      console.error("Currency code not found in dropdown");
-    }
+    $('#exchangeRatesSelect').val($(`#exchangeRatesSelect option[data-currency="${currencyCode}"]`).val());
+    convertCurrency();
   }
 }
 
