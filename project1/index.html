@@ -211,7 +211,9 @@
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p>Wikipedia information will be displayed here.</p>
+          <div id="wikiContent">
+            <!-- Wikipedia entries will be added dynamically here -->
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
@@ -221,35 +223,37 @@
   </div>
 
   <!-- Modal for Exchange Button -->
-  <div id="exchangeRatesModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+  <div id="exchangeRatesModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exchangeRatesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content shadow">
-        <div class="modal-header bg-success bg-gradient text-white">
-          <h5 class="modal-title">Exchange Rate</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content shadow">
+            <div class="modal-header bg-success bg-gradient text-white">
+                <h5 class="modal-title">Currency calculator</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-floating mb-3">
+                        <input id="amount" type="number" class="form-control" value="1" min="1" step="1">
+                        <label for="amount">Amount (USD)</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <select id="exchangeRatesSelect" class="form-select">
+                            <option value="">Select currency</option>
+                        </select>
+                        <label for="exchangeRatesSelect">Convert to</label>
+                    </div>
+                    <div class="form-floating">
+                        <input id="result" type="text" class="form-control" disabled>
+                        <label for="result">Result</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="amount" class="form-label">Amount (USD)</label>
-            <input type="number" id="amount" class="form-control" value="1" min="0" step="0.01">
-          </div>
-          <div class="mb-3">
-            <label for="currency" class="form-label">Currency</label>
-            <select id="exchangeRatesSelect" class="form-control">
-              <!-- Exchange rates options will be loaded here -->
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="result" class="form-label">Converted Amount</label>
-            <input type="text" id="result" class="form-control" readonly>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
+</div>
 
   <!-- partial -->
   <script src='./libs/js/leaflet.js'></script>

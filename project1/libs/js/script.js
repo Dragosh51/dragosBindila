@@ -51,6 +51,314 @@ var exchangeBtn = L.easyButton("fa-money-bill-wave fa-xl", function (btn, map) {
 
 // initialise and add controls once DOM is ready
 
+// function convertCurrency() {
+//   var amount = parseFloat($('#amount').val()) || 1;
+//   var rate = parseFloat($('#exchangeRatesSelect').val());
+//   var currency = $('#exchangeRatesSelect option:selected').data('currency');
+
+//   if (isNaN(rate)) {
+//       $('#result').val('0');
+//       return;
+//   }
+
+//   var convertedAmount = amount * rate;
+//   $('#result').val(convertedAmount.toFixed(2) + ' ' + currency);
+// }
+
+// // AJAX Call Function: Get Currency Code
+// function getCurrencyCode(countryCode, callback) {
+//   $.ajax({
+//       url: 'libs/php/getCountryInfo.php',
+//       type: 'GET',
+//       data: { countryCode: countryCode },
+//       success: function (result) {
+//           if (result.status.code === "200" && result.data && result.data.currencyCode) {
+//               console.log("Currency Code fetched: ", result.data.currencyCode); // Debugging line
+//               callback(result.data.currencyCode);
+//           } else {
+//               console.error("Error: " + result.status.description);
+//           }
+//       },
+//       error: function (jqXHR, textStatus, errorThrown) {
+//           console.error("Error: " + textStatus + " - " + errorThrown);
+//           console.log(jqXHR.responseText);
+//       }
+//   });
+// }
+
+// // AJAX Call Function: Get Exchange Rates
+// function getExchangeRates(callback) {
+//   $.ajax({
+//     url: "libs/php/getExchangeRates.php",
+//     type: 'GET',
+//     dataType: 'json',
+//     success: function (result) {
+//       console.log("Exchange rates fetched: ", result); // Debugging line
+//       if (result.status !== 'error') {
+//         var options = '';
+//         $.each(result.data, function (index, currencyData) {
+//           options += `<option value="${currencyData.rate}" data-currency="${currencyData.code.trim()}">${currencyData.name}</option>`;
+//         });
+//         $('#exchangeRatesSelect').html(options);
+//         if (callback) callback();
+//       } else {
+//         console.error("Error: " + result.message);
+//       }
+//     },
+//     error: function (jqXHR, textStatus, errorThrown) {
+//       console.error("Error: " + textStatus + " - " + errorThrown);
+//       console.log(jqXHR.responseText);
+//     }
+//   });
+// }
+
+// // DOM Manipulation Function: Update Exchange Rates Modal
+// function updateExchangeRatesModal(selectedCurrency) {
+//   getExchangeRates(function () {
+//     updateCurrencyDropdown(selectedCurrency);
+//     convertCurrency(); // Ensure conversion happens with the selected currency
+//   });
+// }
+
+// // DOM Manipulation Function: Update Currency Dropdown
+// function updateCurrencyDropdown(currencyCode) {
+//   console.log("Updating currency dropdown for code:", currencyCode); // Debugging line
+//   if (currencyCode) {
+//     // Ensure the currency code is trimmed and in uppercase
+//     currencyCode = currencyCode.trim().toUpperCase();
+//     console.log("Looking for currency code in dropdown:", currencyCode); // Debugging line
+    
+//     // Log all available options in the dropdown for comparison
+//     $('#exchangeRatesSelect option').each(function() {
+//       console.log("Dropdown option:", $(this).attr('data-currency'), $(this).text());
+//     });
+    
+//     const option = $(`#exchangeRatesSelect option[data-currency="${currencyCode}"]`);
+//     if (option.length) {
+//       console.log("Currency option found: ", option.text()); // Debugging line
+//       const value = option.val();
+//       $('#exchangeRatesSelect').val(value);
+//       console.log("Selected value set to:", $('#exchangeRatesSelect').val()); // Debugging line
+//       convertCurrency();
+//     } else {
+//       console.error("Currency code not found in dropdown");
+//     }
+//   }
+// }
+
+// // Event Listener Function: Setup Event Listeners
+// function setupEventListeners() {
+//   $('#countrySelect').change(function () {
+//       const selectedCountryCode = $(this).val();
+//       const selectedOption = $(`#countrySelect option[value="${selectedCountryCode}"]`);
+//       const countryName = selectedOption.text();
+
+//       console.log('Country selected:', countryName);
+//       console.log('Country code:', selectedCountryCode);
+
+//       updateInfoModal(countryName, selectedOption);
+
+//       if (countryBordersLayer) {
+//           map.removeLayer(countryBordersLayer);
+//       }
+
+//       $.ajax({
+//           url: 'libs/php/getCountryFeature.php',
+//           method: 'GET',
+//           dataType: 'json',
+//           data: { code: selectedCountryCode },
+//           success: function (response) {
+//               if (response.status && response.status.code === "200") {
+//                   const selectedCountry = response.data;
+
+//                   countryBordersLayer = L.geoJSON(selectedCountry, {
+//                       style: {
+//                           color: 'blue',
+//                           weight: 2,
+//                           opacity: 0.3,
+//                           fillOpacity: 0.3
+//                       }
+//                   }).addTo(map);
+
+//                   map.once('zoomend', function () {
+//                       map.fitBounds(countryBordersLayer.getBounds(), {
+//                           padding: [20, 20],
+//                           maxZoom: 10
+//                       });
+//                   });
+
+//                   updateWeatherModal(selectedCountryCode);
+//                   fetchWikipediaData(countryName.replace(/\s+/g, '').toLowerCase());
+//                   fetchNewsData(selectedCountryCode);
+
+//                   updateAirportMarkers(selectedCountryCode);
+//                   updateCityMarkers(selectedCountryCode);
+
+//                   // Fetch the currency code and update the exchange rates modal
+//                   getCurrencyCode(selectedCountryCode, function (currencyCode) {
+//                       updateExchangeRatesModal(currencyCode);
+//                   });
+//               } else {
+//                   console.error('Error from PHP API:', response.status.description);
+//               }
+//           },
+//           error: function (jqXHR, textStatus, errorThrown) {
+//               console.error('AJAX error:', textStatus, ' - ', errorThrown);
+//           }
+//       });
+//   });
+
+//   // Event listeners for checkboxes
+//   $('#airportCheckbox').change(function () {
+//       if ($(this).is(':checked')) {
+//           updateAirportMarkers($('#countrySelect').val());
+//       } else {
+//           removeAirportMarkers();
+//       }
+//   });
+
+//   $('#cityCheckbox').change(function () {
+//       if ($(this).is(':checked')) {
+//           updateCityMarkers($('#countrySelect').val());
+//       } else {
+//           removeCityMarkers();
+//       }
+//   });
+
+//   $('#amount').val('1');
+//   $('#amount').on('input', convertCurrency);
+//   $('#exchangeRatesSelect').on('change', convertCurrency);
+// }
+
+// // Document Ready Function
+// $(document).ready(function () {
+//   // Start fetching user's location immediately
+//   var locationPromise = new Promise(function (resolve, reject) {
+//       if (navigator.geolocation) {
+//           navigator.geolocation.getCurrentPosition(function (position) {
+//               resolve({
+//                   lat: position.coords.latitude,
+//                   lng: position.coords.longitude
+//               });
+//           }, function (error) {
+//               reject("Geolocation error: " + error.message);
+//           });
+//       } else {
+//           reject("Geolocation is not supported by this browser.");
+//       }
+//   });
+
+//   // Show the preloader initially
+//   $('#preloader').show();
+
+//   // Start loading process
+//   locationPromise.then(function (coords) {
+//       var lat = coords.lat;
+//       var lng = coords.lng;
+
+//       // Make AJAX call to the PHP file
+//       $.ajax({
+//           url: 'libs/php/getCountryCode.php',
+//           method: 'GET',
+//           data: {
+//               lat: lat,
+//               lng: lng
+//           },
+//           success: function (data) {
+//               if (data.status.code === "200") {
+//                   var countryCode = data.data.country_code;
+//                   var countryName = data.data.country;
+
+//                   console.log('Country Code:', countryCode);
+//                   console.log('Country Name:', countryName);
+
+//                   // Initialize the app and set up event listeners
+//                   initializeMap();
+//                   setupEventListeners();
+
+//                   // Populate the country dropdown and then set the value and trigger the change event
+//                   populateCountryDropdown(function () {
+//                       // Programmatically select the country in the dropdown
+//                       $('#countrySelect').val(countryCode);
+//                       console.log('Dropdown value set to:', $('#countrySelect').val());
+
+//                       // Manually trigger the change event
+//                       $('#countrySelect').trigger('change');
+
+//                       // Ensure the modals and other updates are triggered
+//                       updateInfoModal($('#countrySelect option:selected').text(), $('#countrySelect option:selected'));
+//                       updateWeatherModal($('#countrySelect option:selected').text());
+//                       fetchWikipediaData(countryCode);
+//                       fetchNewsData(countryCode);
+
+//                       // Fetch the currency code and update the exchange rates modal
+//                       getCurrencyCode(countryCode, function(currencyCode) {
+//                           updateExchangeRatesModal(currencyCode);
+//                       });
+
+//                       // Automatically load markers
+//                       updateAirportMarkers(countryCode);
+//                       updateCityMarkers(countryCode);
+
+//                       // Set the checkboxes to checked by default
+//                       $('#airportCheckbox').prop('checked', true);
+//                       $('#cityCheckbox').prop('checked', true);
+
+//                       // Hide the preloader after everything is loaded
+//                       $('#preloader').fadeOut('slow', function () {
+//                           $(this).remove(); // Remove preloader element after fade out
+//                       });
+//                   });
+
+//                   // Load other data
+//                   loadAirports();
+//                   loadCities();
+//               } else {
+//                   console.error("Error from PHP API: " + data.status.description);
+
+//                   // Initialize the app without user location
+//                   initializeAppWithoutGeolocation();
+//               }
+//           },
+//           error: function (jqXHR, textStatus, errorThrown) {
+//               console.error("AJAX error: " + textStatus + " - " + errorThrown);
+
+//               // Initialize the app without user location
+//               initializeAppWithoutGeolocation();
+//           }
+//       });
+//   }).catch(function (error) {
+//       console.error(error);
+
+//       // Initialize the app without user location
+//       initializeAppWithoutGeolocation();
+//   });
+
+//   function initializeAppWithoutGeolocation() {
+//       initializeMap();
+//       setupEventListeners();
+//       getExchangeRates();
+//       loadAirports();
+//       loadCities();
+
+//       // Automatically load markers for the initial view (e.g., default country)
+//       const initialCountryCode = $('#countrySelect').val();
+//       if (initialCountryCode) {
+//           updateAirportMarkers(initialCountryCode);
+//           updateCityMarkers(initialCountryCode);
+//       }
+
+//       // Set the checkboxes to checked by default
+//       $('#airportCheckbox').prop('checked', true);
+//       $('#cityCheckbox').prop('checked', true);
+
+//       // Hide the preloader in case of error
+//       $('#preloader').fadeOut('slow', function () {
+//           $(this).remove(); 
+//       });
+//   }
+// });
+
 $(document).ready(function () {
   // Start fetching user's location immediately
   var locationPromise = new Promise(function (resolve, reject) {
@@ -252,7 +560,6 @@ function setupEventListeners() {
             }
           }).addTo(map);
 
-          // Use the map.once function to ensure fitBounds is called only once.
           map.once('zoomend', function () {
             map.fitBounds(countryBordersLayer.getBounds(), {
               padding: [20, 20],
@@ -261,16 +568,16 @@ function setupEventListeners() {
           });
 
           updateWeatherModal(selectedCountryCode);
-          fetchWikipediaData(countryName);
+          fetchWikipediaData(countryName.replace(/\s+/g, '').toLowerCase());
           fetchNewsData(selectedCountryCode);
 
-          // Automatically load markers for the selected country
           updateAirportMarkers(selectedCountryCode);
           updateCityMarkers(selectedCountryCode);
 
-          // Ensure checkboxes reflect current state
-          $('#airportCheckbox').prop('checked', true);
-          $('#cityCheckbox').prop('checked', true);
+          // // Fetch the currency code and update the exchange rates modal
+          // getCurrencyCode(selectedCountryCode, function (currencyCode) {
+          //   updateCurrencyDropdown(currencyCode);
+          // });
         } else {
           console.error('Error from PHP API:', response.status.description);
         }
@@ -621,7 +928,7 @@ function getExchangeRates() {
     success: function (result) {
       console.log(result);
       if (result.status !== 'error') {
-        var options = '';
+        var options = '<option value="">Select currency</option>';
         $.each(result.rates, function (currency, rate) {
           options += `<option value="${rate}" data-currency="${currency}">${currency}</option>`;
         });
@@ -654,8 +961,13 @@ function convertCurrency() {
 
 function updateCurrencyDropdown(currencyCode) {
   if (currencyCode) {
-    $('#exchangeRatesSelect').val($(`#exchangeRatesSelect option[data-currency="${currencyCode}"]`).val());
-    convertCurrency();
+    const option = $(`#exchangeRatesSelect option[data-currency="${currencyCode}"]`);
+    if (option.length) {
+      $('#exchangeRatesSelect').val(option.val());
+      convertCurrency();
+    } else {
+      console.error("Currency code not found in dropdown");
+    }
   }
 }
 
@@ -713,37 +1025,47 @@ function updateInfoModal(countryName, selectedOption) {
 }
 
 function fetchWikipediaData(query) {
+  // Replace spaces with empty strings and convert to lowercase to format the query correctly
+  var formattedQuery = query.replace(/\s+/g, '').toLowerCase();
+
   $.ajax({
     url: 'libs/php/getWikiData.php',
     method: 'GET',
-    data: { q: query, maxRows: 10 },
+    data: { q: formattedQuery, maxRows: 10 },
     success: function (data) {
       if (data.status.code === "200") {
-        var wikiContent = '';
+        const wikiContent = $('#wikiContent');
+        wikiContent.empty(); // Clear any existing content
+
         data.data.geonames.forEach(function (entry) {
           // Ensure the URL has a protocol
-          let wikipediaUrl = entry.wikipediaUrl.startsWith('http') ? entry.wikipediaUrl : 'http://' + entry.wikipediaUrl;
+          const wikipediaUrl = entry.wikipediaUrl.startsWith('http') ? entry.wikipediaUrl : 'http://' + entry.wikipediaUrl;
+          
+          // Create a new entry element
+          const entryElement = $('<div class="wiki-entry d-flex align-items-start mb-3"></div>');
           
           // Add thumbnail image if present
-          let thumbnailImg = entry.thumbnailImg ? `<img src="${entry.thumbnailImg}" alt="${entry.title} thumbnail" class="img-thumbnail" style="max-width: 100px; margin-right: 10px;">` : '';
+          if (entry.thumbnailImg) {
+            entryElement.append(`<img src="${entry.thumbnailImg}" alt="${entry.title} thumbnail" class="img-thumbnail me-3" style="max-width: 100px;">`);
+          }
           
-          wikiContent += `<div class="wiki-entry" style="display: flex; align-items: flex-start;">`;
-          wikiContent += `${thumbnailImg}<div>`;
-          wikiContent += `<h5>${entry.title}</h5>`;
-          wikiContent += `<p>${entry.summary}</p>`;
-          wikiContent += `<a href="${wikipediaUrl}" target="_blank">Read more</a>`;
-          wikiContent += `</div></div><hr>`;
+          // Add the entry details
+          const detailsElement = $('<div></div>');
+          detailsElement.append(`<h5><a href="${wikipediaUrl}" target="_blank" class="text-decoration-none text-dark">${entry.title}</a></h5>`);
+          detailsElement.append(`<p>${entry.summary}</p>`);
+          
+          entryElement.append(detailsElement);
+          wikiContent.append(entryElement);
         });
-        $('#wikiModal .modal-body').html(wikiContent);
 
       } else {
         console.error('Error fetching Wikipedia data:', data.status.description);
-        $('#wikiModal .modal-body').html('<p>Error fetching Wikipedia data.</p>');
+        $('#wikiContent').html('<p>Error fetching Wikipedia data.</p>');
       }
     },
     error: function (err) {
       console.log("Error: ", err);
-      $('#wikiModal .modal-body').html('<p>Error fetching Wikipedia data.</p>');
+      $('#wikiContent').html('<p>Error fetching Wikipedia data.</p>');
     }
   });
 }

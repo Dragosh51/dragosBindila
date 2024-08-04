@@ -44,6 +44,7 @@ if ($decodedData === null) {
 $countries = array_map(function ($country) {
     return [
         'code' => $country['properties']['iso_a2'],
+        'iso_a3' => $country['properties']['iso_a3'],
         'name' => $country['properties']['name']
     ];
 }, $decodedData['features']);
