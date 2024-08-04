@@ -408,7 +408,7 @@ $(document).ready(function () {
           populateCountryDropdown(function () {
             // Programmatically select the country in the dropdown
             $('#countrySelect').val(countryCode);
-            console.log('Dropdown value set to:', $('#countrySelect').val());
+            //console.log('Dropdown value set to:', $('#countrySelect').val());
 
             // Manually trigger the change event
             $('#countrySelect').trigger('change');
@@ -492,7 +492,7 @@ function populateCountryDropdown(callback) {
     method: 'GET',
     dataType: 'json',
     success: function (response) {
-      console.log('Full Response from PHP:', response); 
+      //console.log('Full Response from PHP:', response); 
 
       if (response.status && response.status.code === "200") {
         var countries = response.data;
@@ -534,7 +534,7 @@ function setupEventListeners() {
     const countryName = selectedOption.text();
 
     console.log('Country selected:', countryName);
-    console.log('Country code:', selectedCountryCode);
+    //console.log('Country code:', selectedCountryCode);
 
     updateInfoModal(countryName, selectedOption);
 
@@ -658,7 +658,7 @@ function loadAirports() {
       country: ''
     },
     success: function (data) {
-      console.log('Loaded airports data:', data);
+      //console.log('Loaded airports data:', data);
       airportsData = data.data.geonames;
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -677,7 +677,7 @@ function loadCities() {
       country: ''
     },
     success: function (data) {
-      console.log('Loaded cities data:', data);
+      //console.log('Loaded cities data:', data);
       citiesData = data.data.geonames;
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -731,7 +731,7 @@ function updateAirportMarkers(countryCode) {
       country: countryCode
     },
     success: function (data) {
-      console.log('Loaded airports data for country:', data);
+      //console.log('Loaded airports data for country:', data);
       airportsData = data.data.geonames;
       addAirportMarkers();
     },
@@ -787,7 +787,7 @@ function updateCityMarkers(countryCode) {
       country: countryCode
     },
     success: function (data) {
-      console.log('Loaded cities data for country:', data);
+      //console.log('Loaded cities data for country:', data);
       citiesData = data.data.geonames;
       addCityMarkers();
     },
@@ -815,7 +815,7 @@ function updateWeatherModal(countryCode) {
         }
 
         var encodedCityName = encodeURIComponent(capitalCity);
-        console.log("City Name", encodedCityName);
+        //console.log("City Name", encodedCityName);
 
         // Fetch weather data for the capital city
         $.ajax({
@@ -823,7 +823,7 @@ function updateWeatherModal(countryCode) {
           method: 'GET',
           data: { q: encodedCityName },
           success: function (data) {
-            console.log('Response data:', data);
+            //console.log('Response data:', data);
             if (data.status && data.status.code === "200") {
               var d = data.data;
               $('#weatherModalLabel').html(d.location.country + ", " + d.location.name);
@@ -894,13 +894,33 @@ function getCurrencyCode(countryCode, callback) {
   });
 }
 
+// function getCurrencyNames(callback) {
+//   $.ajax({
+//     url: "libs/php/getCurrencyNames.php",
+//     type: 'GET',
+//     dataType: 'json',
+//     success: function (result) {
+//       console.log("Currency names result:", result); // Debugging line
+//       if (result.status && result.status.code === 200) {
+//         callback(result.data);
+//       } else {
+//         console.error("Error fetching currency names: " + (result.message || 'Unknown error'));
+//       }
+//     },
+//     error: function (jqXHR, textStatus, errorThrown) {
+//       console.error("Error: " + textStatus + " - " + errorThrown);
+//       console.log(jqXHR.responseText);
+//     }
+//   });
+// }
+
 function updateExchangeRatesModal(selectedCurrency) {
   $.ajax({
     url: "libs/php/getExchangeRates.php",
     type: 'GET',
     dataType: 'json',
     success: function (result) {
-      console.log(result);
+      //console.log(result);
       if (result.status !== 'error') {
         var options = '';
         $.each(result.rates, function (currency, rate) {
@@ -926,7 +946,7 @@ function getExchangeRates() {
     type: 'GET',
     dataType: 'json',
     success: function (result) {
-      console.log(result);
+      //console.log(result);
       if (result.status !== 'error') {
         var options = '';
         $.each(result.rates, function (currency, rate) {
@@ -975,7 +995,7 @@ function updateInfoModal(countryName, selectedOption) {
     method: 'GET',
     data: { q: encodedCountryName },
     success: function (data) {
-      console.log('Response data:', data);
+      //console.log('Response data:', data);
       if (data.status && data.status.code === "200") {
         var results = data.data.results[0];
         lat = results.geometry.lat;
@@ -1067,14 +1087,14 @@ function fetchWikipediaData(query) {
 
 function fetchNewsData(countryCode) {
   var encodedCountryCode = encodeURIComponent(countryCode);
-  console.log('Country code news', countryCode);
+  //console.log('Country code news', countryCode);
 
   $.ajax({
     url: 'libs/php/getNewsData.php',
     method: 'GET',
     data: { q: encodedCountryCode },
     success: function (data) {
-      console.log('API Response:', data);
+      //console.log('API Response:', data);
 
       if (data.status.code === "200") {
         var newsContent = $('#newsContent');
