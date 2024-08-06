@@ -98,7 +98,6 @@ html, body {
 
 .modal-body {
   overflow: hidden;
-  min-height: 350px;
 }
 
 .fadeOut {

@@ -8,8 +8,7 @@
   <link rel='stylesheet' href='./libs/css/leaflet.css'>
   <link rel='stylesheet' href='./libs/css/toastify.min.css'>
   <link rel='stylesheet' href='./libs/css/MarkerCluster.Default.min.css'>
-  <link rel='stylesheet'
-    href='./libs/css/MarkerCluster.min.css'>
+  <link rel='stylesheet' href='./libs/css/MarkerCluster.min.css'>
   <link rel="stylesheet" href="./libs/css/leaflet.extra-markers.min.css">
   <link rel='stylesheet' href='./libs/css/fontawesome/css/fontawesome.css'>
   <link rel='stylesheet' href='./libs/css/fontawesome/css/brands.css'>
@@ -44,7 +43,7 @@
 
   <!-- example modal layout -->
 
-  <div id="infoModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+  <div id="infoModal" class="modal fade" data-bs-backdrop="false" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content shadow">
         <div class="modal-header bg-success bg-gradient text-white">
@@ -105,7 +104,7 @@
   </div>
 
   <!-- Modal for weather Button -->
-  <div id="weatherModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="weatherModalLabel" aria-hidden="true">
+  <div id="weatherModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="true" aria-labelledby="weatherModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content shadow">
         <div class="modal-header bg-primary bg-gradient text-white">
@@ -125,8 +124,10 @@
                   <img id="todayIcon" class="img-fluid mt-0" src="" alt="" title="">
                 </div>
                 <div class="col text-center">
-                  <p class="fw-bold fs-4 mb-0"><span id="todayMaxTemp"></span><sup>o</sup><span class="tempMetric">c</span></p>
-                  <p class="fs-5 mt-0 text-secondary"><span id="todayMinTemp"></span><sup>o</sup><span class="tempMetric">c</span></p>
+                  <p class="fw-bold fs-4 mb-0"><span id="todayMaxTemp"></span><sup>o</sup><span
+                      class="tempMetric">c</span></p>
+                  <p class="fs-5 mt-0 text-secondary"><span id="todayMinTemp"></span><sup>o</sup><span
+                      class="tempMetric">c</span></p>
                 </div>
               </div>
             </div>
@@ -167,14 +168,15 @@
           </div>
         </div>
         <div class="modal-footer">
-          <p class="fs-6 fw-light">Last updated <span id="lastUpdated"></span>. Powered by <a href="https://www.weatherapi.com/" target="_blank" title="Free Weather API">WeatherAPI.com</a></p>
+          <p class="fs-6 fw-light">Last updated <span id="lastUpdated"></span>. Powered by <a
+              href="https://www.weatherapi.com/" target="_blank" title="Free Weather API">WeatherAPI.com</a></p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Modal for News Button -->
-  <div id="newsModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+  <div id="newsModal" class="modal fade" data-bs-backdrop="false" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content shadow">
         <div class="modal-header bg-info bg-gradient text-white">
@@ -203,7 +205,7 @@
   </div>
 
   <!-- Modal for Wikipedia Button -->
-  <div id="wikiModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+  <div id="wikiModal" class="modal fade" data-bs-backdrop="false" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content shadow">
         <div class="modal-header bg-success bg-gradient text-white">
@@ -223,8 +225,8 @@
   </div>
 
   <!-- Modal for Exchange Button -->
-  <div id="exchangeRatesModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exchangeRatesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+  <div id="exchangeRatesModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="true" aria-labelledby="exchangeRatesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow">
             <div class="modal-header bg-success bg-gradient text-white">
                 <h5 class="modal-title">Currency calculator</h5>
