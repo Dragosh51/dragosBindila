@@ -65,25 +65,17 @@
         <table class="table table-hover">
           <tbody id="personnelTableBody">
             <!-- Dynamic rows will be populated here via JavaScript -->
-            <tr>
-              <td class="align-middle text-nowrap">
-                Ace, Tamarra
-              </td>
-              <td class="align-middle text-nowrap d-none d-md-table-cell">
-                Support
-              </td>
-              <td class="align-middle text-nowrap d-none d-md-table-cell">
-                Munich
-              </td>
-              <td class="align-middle text-nowrap d-none d-md-table-cell">
-                tacem@vinaora.com
-              </td>
+            <tr class="personnel-row d-none">
+              <td class="align-middle text-nowrap personnel-name"></td>
+              <td class="align-middle text-nowrap d-none d-md-table-cell personnel-jobTitle"></td>
+              <td class="align-middle text-nowrap d-none d-md-table-cell personnel-location"></td>
+              <td class="align-middle text-nowrap d-none d-md-table-cell personnel-email"></td>
               <td class="text-end text-nowrap">
-                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="23">
-                  <i class="fa-solid fa-pencil fa-fw"></i>
+                <button type="button" class="btn btn-primary btn-sm edit-personnel-btn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal">
+                    <i class="fa-solid fa-pencil fa-fw"></i>
                 </button>
-                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="23">
-                  <i class="fa-solid fa-trash fa-fw"></i>
+                <button type="button" class="btn btn-primary btn-sm delete-personnel-btn" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal">
+                    <i class="fa-solid fa-trash fa-fw"></i>
                 </button>
               </td>
             </tr>
@@ -95,19 +87,15 @@
         <table class="table table-hover">
           <tbody id="departmentTableBody">
             <!-- Dynamic rows will be populated here via JavaScript -->
-            <tr>
-              <td class="align-middle text-nowrap">
-                Human resources
-              </td>
-              <td class="align-middle text-nowrap d-none d-md-table-cell">
-                London
-              </td>
+            <tr class="department-row d-none">
+              <td class="align-middle text-nowrap department-name"></td>
+              <td class="align-middle text-nowrap d-none d-md-table-cell department-location"></td>
               <td class="align-middle text-end text-nowrap">
-                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="1">
-                  <i class="fa-solid fa-pencil fa-fw"></i>
+                <button type="button" class="btn btn-primary btn-sm edit-department-btn" data-bs-toggle="modal" data-bs-target="#editDepartmentModal">
+                    <i class="fa-solid fa-pencil fa-fw"></i>
                 </button>
-                <button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="1">
-                  <i class="fa-solid fa-trash fa-fw"></i>
+                <button type="button" class="btn btn-primary btn-sm delete-department-btn">
+                    <i class="fa-solid fa-trash fa-fw"></i>
                 </button>
               </td>
             </tr>
@@ -119,16 +107,14 @@
         <table class="table table-hover">
           <tbody id="locationTableBody">
             <!-- Dynamic rows will be populated here via JavaScript -->
-            <tr>
-              <td class="align-middle text-nowrap">
-                London
-              </td>
+            <tr class="location-row d-none">
+              <td class="align-middle text-nowrap location-name"></td>
               <td class="align-middle text-end text-nowrap">
-                <button type="button" class="btn btn-primary btn-sm">
-                  <i class="fa-solid fa-pencil fa-fw"></i>
+                <button type="button" class="btn btn-primary btn-sm edit-location-btn">
+                    <i class="fa-solid fa-pencil fa-fw"></i>
                 </button>
-                <button type="button" class="btn btn-primary btn-sm">
-                  <i class="fa-solid fa-trash fa-fw"></i>
+                <button type="button" class="btn btn-primary btn-sm delete-location-btn">
+                    <i class="fa-solid fa-trash fa-fw"></i>
                 </button>
               </td>
             </tr>
