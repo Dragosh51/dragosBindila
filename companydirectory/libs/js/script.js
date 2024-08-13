@@ -89,64 +89,16 @@ $("#applyFilterBtn").click(function () {
       },
       success: function (result) {
           if (result.status.name == "ok") {
-              $("#personnelTableBody").empty();
+              $("#personnelTableBody .personnel-row:not(.d-none)").remove(); // Clear existing rows except the template
               result.data.forEach(person => {
-                  let row = `<tr>
-                      <td class="align-middle text-nowrap">${person.firstName} ${person.lastName}</td>
-                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.jobTitle}</td>
-                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.location}</td>
-                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.email}</td>
-                      <td class="text-end text-nowrap">
-                          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="${person.id}">
-                              <i class="fa-solid fa-pencil fa-fw"></i>
-                          </button>
-                          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="${person.id}">
-                              <i class="fa-solid fa-trash fa-fw"></i>
-                          </button>
-                      </td>
-                  </tr>`;
-                  $("#personnelTableBody").append(row);
-              });
-              $("#filterModal").modal("hide");
-          }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-          console.log("Error: ", textStatus, errorThrown);
-      }
-  });
-});
-
-$("#applyFilterBtn").click(function () {
-  const selectedDepartment = $("#filterDepartment").val();
-  const selectedLocation = $("#filterLocation").val();
-
-  $.ajax({
-      url: "libs/php/getFilteredPersonnel.php",
-      type: "POST",
-      dataType: "json",
-      data: {
-          departmentID: selectedDepartment,
-          locationID: selectedLocation
-      },
-      success: function (result) {
-          if (result.status.name == "ok") {
-              $("#personnelTableBody").empty();
-              result.data.forEach(person => {
-                  let row = `<tr>
-                      <td class="align-middle text-nowrap">${person.firstName} ${person.lastName}</td>
-                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.jobTitle}</td>
-                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.location}</td>
-                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.email}</td>
-                      <td class="text-end text-nowrap">
-                          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="${person.id}">
-                              <i class="fa-solid fa-pencil fa-fw"></i>
-                          </button>
-                          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="${person.id}">
-                              <i class="fa-solid fa-trash fa-fw"></i>
-                          </button>
-                      </td>
-                  </tr>`;
-                  $("#personnelTableBody").append(row);
+                  let $row = $("#personnelTableBody .personnel-row.d-none").clone().removeClass("d-none");
+                  $row.find(".personnel-name").text(`${person.firstName} ${person.lastName}`);
+                  $row.find(".personnel-jobTitle").text(person.jobTitle);
+                  $row.find(".personnel-location").text(person.location);
+                  $row.find(".personnel-email").text(person.email);
+                  $row.find(".edit-personnel-btn").attr("data-id", person.id);
+                  $row.find(".delete-personnel-btn").attr("data-id", person.id);
+                  $("#personnelTableBody").append($row);
               });
               $("#filterModal").modal("hide");
           }
