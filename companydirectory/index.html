@@ -170,6 +170,38 @@
     </div>
   </div>
 
+  <!-- Filter Modal -->
+<div id="filterModal" class="modal fade" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="filterModalLabel">Filter Personnel</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <div class="form-group mb-3">
+                  <label for="filterDepartment">Department</label>
+                  <select id="filterDepartment" class="form-select">
+                      <option value="">All Departments</option>
+                      <!-- Options will be populated dynamically -->
+                  </select>
+              </div>
+              <div class="form-group mb-3">
+                  <label for="filterLocation">Location</label>
+                  <select id="filterLocation" class="form-select">
+                      <option value="">All Locations</option>
+                      <!-- Options will be populated dynamically -->
+                  </select>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" id="applyFilterBtn">Apply Filter</button>
+          </div>
+      </div>
+  </div>
+</div>
+
   <!-- JavaScript Files -->
   <script src='./libs/js/jquery.min.js'></script>
   <script src='./libs/js/toastify.min.js'></script>

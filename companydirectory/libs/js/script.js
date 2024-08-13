@@ -35,6 +35,128 @@ $("#refreshBtn").click(function () {
   }
 });
 
+$("#filterBtn").click(function () {
+  // Fetch departments and locations to populate dropdowns
+  $.ajax({
+      url: "libs/php/getAllDepartments.php",
+      type: "GET",
+      dataType: "json",
+      success: function (result) {
+          if (result.status.name == "ok") {
+              $("#filterDepartment").empty().append('<option value="">All Departments</option>');
+              result.data.forEach(department => {
+                  $("#filterDepartment").append(`<option value="${department.id}">${department.name}</option>`);
+              });
+          }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          console.log("Error: ", textStatus, errorThrown);
+      }
+  });
+
+  $.ajax({
+      url: "libs/php/getAllLocations.php",
+      type: "GET",
+      dataType: "json",
+      success: function (result) {
+          if (result.status.name == "ok") {
+              $("#filterLocation").empty().append('<option value="">All Locations</option>');
+              result.data.forEach(location => {
+                  $("#filterLocation").append(`<option value="${location.id}">${location.name}</option>`);
+              });
+          }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          console.log("Error: ", textStatus, errorThrown);
+      }
+  });
+
+  // Show the modal
+  $("#filterModal").modal("show");
+});
+
+$("#applyFilterBtn").click(function () {
+  const selectedDepartment = $("#filterDepartment").val();
+  const selectedLocation = $("#filterLocation").val();
+
+  $.ajax({
+      url: "libs/php/getFilteredPersonnel.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+          departmentID: selectedDepartment,
+          locationID: selectedLocation
+      },
+      success: function (result) {
+          if (result.status.name == "ok") {
+              $("#personnelTableBody").empty();
+              result.data.forEach(person => {
+                  let row = `<tr>
+                      <td class="align-middle text-nowrap">${person.firstName} ${person.lastName}</td>
+                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.jobTitle}</td>
+                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.location}</td>
+                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.email}</td>
+                      <td class="text-end text-nowrap">
+                          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="${person.id}">
+                              <i class="fa-solid fa-pencil fa-fw"></i>
+                          </button>
+                          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="${person.id}">
+                              <i class="fa-solid fa-trash fa-fw"></i>
+                          </button>
+                      </td>
+                  </tr>`;
+                  $("#personnelTableBody").append(row);
+              });
+              $("#filterModal").modal("hide");
+          }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          console.log("Error: ", textStatus, errorThrown);
+      }
+  });
+});
+
+$("#applyFilterBtn").click(function () {
+  const selectedDepartment = $("#filterDepartment").val();
+  const selectedLocation = $("#filterLocation").val();
+
+  $.ajax({
+      url: "libs/php/getFilteredPersonnel.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+          departmentID: selectedDepartment,
+          locationID: selectedLocation
+      },
+      success: function (result) {
+          if (result.status.name == "ok") {
+              $("#personnelTableBody").empty();
+              result.data.forEach(person => {
+                  let row = `<tr>
+                      <td class="align-middle text-nowrap">${person.firstName} ${person.lastName}</td>
+                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.jobTitle}</td>
+                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.location}</td>
+                      <td class="align-middle text-nowrap d-none d-md-table-cell">${person.email}</td>
+                      <td class="text-end text-nowrap">
+                          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="${person.id}">
+                              <i class="fa-solid fa-pencil fa-fw"></i>
+                          </button>
+                          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="${person.id}">
+                              <i class="fa-solid fa-trash fa-fw"></i>
+                          </button>
+                      </td>
+                  </tr>`;
+                  $("#personnelTableBody").append(row);
+              });
+              $("#filterModal").modal("hide");
+          }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          console.log("Error: ", textStatus, errorThrown);
+      }
+  });
+});
+
 // Load Personnel Table
 function loadPersonnel() {
   $.ajax({
