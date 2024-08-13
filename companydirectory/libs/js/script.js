@@ -1,5 +1,27 @@
-$("#searchInp").on("keyup", function () {
-  // Implement search functionality here
+// Function to filter table based on search input
+function filterTable(tableBodyId, searchTerm) {
+  const rows = $(`#${tableBodyId} tr`);
+  rows.each(function() {
+      const rowText = $(this).text().toLowerCase();
+      if (rowText.indexOf(searchTerm.toLowerCase()) !== -1) {
+          $(this).show();
+      } else {
+          $(this).hide();
+      }
+  });
+}
+
+// Event listener for search input
+$("#searchInp").on("keyup", function() {
+  const searchTerm = $(this).val();
+  
+  if ($("#personnelBtn").hasClass("active")) {
+      filterTable("personnelTableBody", searchTerm);
+  } else if ($("#departmentsBtn").hasClass("active")) {
+      filterTable("departmentTableBody", searchTerm);
+  } else if ($("#locationsBtn").hasClass("active")) {
+      filterTable("locationTableBody", searchTerm);
+  }
 });
 
 // Refresh button functionality
