@@ -26,13 +26,25 @@ $("#searchInp").on("keyup", function() {
 
 // Refresh button functionality
 $("#refreshBtn").click(function () {
-  if ($("#personnelBtn").hasClass("active")) {
-      loadPersonnel();
-  } else if ($("#departmentsBtn").hasClass("active")) {
-      loadDepartments();
-  } else {
-      loadLocations();
-  }
+    // Clear the search input
+    $("#searchInp").val('');
+
+    // Check which tab is active and load the appropriate data
+    if ($("#personnelBtn").hasClass("active")) {
+        loadPersonnel();
+    } else if ($("#departmentsBtn").hasClass("active")) {
+        loadDepartments();
+    } else {
+        loadLocations();
+    }
+
+    // Optionally, manually trigger the keyup event to reset the filtering
+    $("#searchInp").trigger("keyup");
+    
+    // Option to clear filters if needed
+    // $("#filterDepartment").val('');
+    // $("#filterLocation").val('');
+    // $("#applyFilterBtn").trigger("click");
 });
 
 $("#filterBtn").click(function () {
@@ -111,30 +123,30 @@ $("#applyFilterBtn").click(function () {
 
 // Load Personnel Table
 function loadPersonnel() {
-  $.ajax({
-      url: "libs/php/getAll.php",
-      type: "GET",
-      dataType: "json",
-      success: function (result) {
-          if (result.status.name == "ok") {
-              $("#personnelTableBody .personnel-row:not(.d-none)").remove(); // Clear existing rows
-              result.data.forEach(person => {
-                  let $row = $("#personnelTableBody .personnel-row.d-none").clone().removeClass("d-none");
-                  $row.find(".personnel-name").text(`${person.firstName} ${person.lastName}`);
-                  $row.find(".personnel-jobTitle").text(person.jobTitle);
-                  $row.find(".personnel-location").text(person.location);
-                  $row.find(".personnel-email").text(person.email);
-                  $row.find(".edit-personnel-btn").attr("data-id", person.id);
-                  $row.find(".delete-personnel-btn").attr("data-id", person.id);
-                  $("#personnelTableBody").append($row);
-              });
-          }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-          console.log("Error: ", textStatus, errorThrown);
-      }
-  });
-}
+    $.ajax({
+        url: "libs/php/getAll.php",
+        type: "GET",
+        dataType: "json",
+        success: function (result) {
+            if (result.status.name == "ok") {
+                $("#personnelTableBody .personnel-row:not(.d-none)").remove(); // Clear existing rows
+                result.data.forEach(person => {
+                    let $row = $("#personnelTableBody .personnel-row.d-none").clone().removeClass("d-none");
+                    $row.find(".personnel-name").text(`${person.firstName} ${person.lastName}`);
+                    $row.find(".personnel-jobTitle").text(person.department); // Update this line to use department instead of job title
+                    $row.find(".personnel-location").text(person.location);
+                    $row.find(".personnel-email").text(person.email);
+                    $row.find(".edit-personnel-btn").attr("data-id", person.id);
+                    $row.find(".delete-personnel-btn").attr("data-id", person.id);
+                    $("#personnelTableBody").append($row);
+                });
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log("Error: ", textStatus, errorThrown);
+        }
+    });
+  }
 
 // Load Departments Table
 function loadDepartments() {
