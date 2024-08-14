@@ -121,6 +121,143 @@ $("#applyFilterBtn").click(function () {
   });
 });
 
+$("#addBtn").click(function () {
+    $(".add-form").addClass("d-none"); // Hide all forms by default
+
+    if ($("#personnelBtn").hasClass("active")) {
+        // Update modal for adding personnel
+        $("#addModalLabel").text("Add Personnel");
+        $("#addPersonnelForm").removeClass("d-none");
+
+        // Populate department dropdown
+        $.ajax({
+            url: "libs/php/getAllDepartments.php",
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                if (result.status.name == "ok") {
+                    $("#addPersonnelDepartment").empty();
+                    result.data.forEach(department => {
+                        $("#addPersonnelDepartment").append(`<option value="${department.id}">${department.name}</option>`);
+                    });
+                    $("#addModal").modal("show");
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("Error: ", textStatus, errorThrown);
+            }
+        });
+
+    } else if ($("#departmentsBtn").hasClass("active")) {
+        // Update modal for adding department
+        $("#addModalLabel").text("Add Department");
+        $("#addDepartmentForm").removeClass("d-none");
+
+        // Populate location dropdown
+        $.ajax({
+            url: "libs/php/getAllLocations.php",
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                if (result.status.name == "ok") {
+                    $("#addDepartmentLocation").empty();
+                    result.data.forEach(location => {
+                        $("#addDepartmentLocation").append(`<option value="${location.id}">${location.name}</option>`);
+                    });
+                    $("#addModal").modal("show");
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("Error: ", textStatus, errorThrown);
+            }
+        });
+
+    } else if ($("#locationsBtn").hasClass("active")) {
+        // Update modal for adding location
+        $("#addModalLabel").text("Add Location");
+        $("#addLocationForm").removeClass("d-none");
+        $("#addModal").modal("show");
+    }
+});
+
+// Save button functionality
+$("#saveBtn").click(function () {
+    if ($("#addPersonnelForm").is(":visible")) {
+        // Save new personnel
+        const firstName = $("#addPersonnelFirstName").val();
+        const lastName = $("#addPersonnelLastName").val();
+        const email = $("#addPersonnelEmail").val();
+        const departmentID = $("#addPersonnelDepartment").val();
+
+        $.ajax({
+            url: "libs/php/insertPersonnel.php",
+            type: "POST",
+            dataType: "json",
+            data: {
+                firstName,
+                lastName,
+                email,
+                departmentID
+            },
+            success: function (result) {
+                if (result.status.name == "ok") {
+                    $("#addModal").modal("hide");
+                    loadPersonnel(); // Refresh the personnel table
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("Error: ", textStatus, errorThrown);
+            }
+        });
+
+    } else if ($("#addDepartmentForm").is(":visible")) {
+        // Save new department
+        const name = $("#addDepartmentName").val();
+        const locationID = $("#addDepartmentLocation").val();
+
+        $.ajax({
+            url: "libs/php/insertDepartment.php",
+            type: "POST",
+            dataType: "json",
+            data: {
+                name,
+                locationID
+            },
+            success: function (result) {
+                if (result.status.name == "ok") {
+                    $("#addModal").modal("hide");
+                    loadDepartments(); // Refresh the departments table
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("Error: ", textStatus, errorThrown);
+            }
+        });
+
+    } else if ($("#addLocationForm").is(":visible")) {
+        // Save new location
+        const name = $("#addLocationName").val();
+
+        $.ajax({
+            url: "libs/php/insertLocation.php",
+            type: "POST",
+            dataType: "json",
+            data: {
+                name
+            },
+            success: function (result) {
+                if (result.status.name == "ok") {
+                    $("#addModal").modal("hide");
+                    loadLocations(); // Refresh the locations table
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("Error: ", textStatus, errorThrown);
+            }
+        });
+    }
+});
+
 // Load Personnel Table
 function loadPersonnel() {
     $.ajax({

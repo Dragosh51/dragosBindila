@@ -28,16 +28,74 @@
 
         <div class="col-6 text-end me-2">
           <div class="btn-group" role="group" aria-label="buttons">
-            <button id="refreshBtn" type="button" class="btn btn-primary">
-              <i class="fa-solid fa-refresh fa-fw"></i>
-            </button>
-            <button id="filterBtn" type="button" class="btn btn-primary">
-              <i class="fa-solid fa-filter fa-fw"></i>
-            </button>
-            <button id="addBtn" type="button" class="btn btn-primary">
-              <i class="fa-solid fa-plus fa-fw"></i>
-            </button>
+              <button id="refreshBtn" type="button" class="btn btn-primary">
+                  <i class="fa-solid fa-refresh fa-fw"></i>
+              </button>
+              <button id="filterBtn" type="button" class="btn btn-primary">
+                  <i class="fa-solid fa-filter fa-fw"></i>
+              </button>
+              <button id="addBtn" type="button" class="btn btn-primary">
+                  <i class="fa-solid fa-plus fa-fw"></i>
+              </button>
           </div>
+      </div>
+      </div>
+      
+      <!-- Universal Add Modal -->
+      <div id="addModal" class="modal fade" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Add New</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="addPersonnelForm" class="add-form d-none">
+                        <div class="form-group mb-3">
+                            <label for="addPersonnelFirstName">First Name</label>
+                            <input type="text" id="addPersonnelFirstName" class="form-control" placeholder="Enter first name">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPersonnelLastName">Last Name</label>
+                            <input type="text" id="addPersonnelLastName" class="form-control" placeholder="Enter last name">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPersonnelEmail">Email</label>
+                            <input type="email" id="addPersonnelEmail" class="form-control" placeholder="Enter email">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addPersonnelDepartment">Department</label>
+                            <select id="addPersonnelDepartment" class="form-select">
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+      
+                    <div id="addDepartmentForm" class="add-form d-none">
+                        <div class="form-group mb-3">
+                            <label for="addDepartmentName">Department Name</label>
+                            <input type="text" id="addDepartmentName" class="form-control" placeholder="Enter department name">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="addDepartmentLocation">Location</label>
+                            <select id="addDepartmentLocation" class="form-select">
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+      
+                    <div id="addLocationForm" class="add-form d-none">
+                        <div class="form-group mb-3">
+                            <label for="addLocationName">Location Name</label>
+                            <input type="text" id="addLocationName" class="form-control" placeholder="Enter location name">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+                </div>
+            </div>
         </div>
       </div>
 
