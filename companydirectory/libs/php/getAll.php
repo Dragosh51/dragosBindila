@@ -35,7 +35,12 @@ if (mysqli_connect_errno()) {
 //           LEFT JOIN department d ON (d.id = p.departmentID) 
 //           LEFT JOIN location l ON (l.id = d.locationID) 
 //           ORDER BY p.lastName, p.firstName';
-$query = 'SELECT p.lastName, p.firstName, d.name as department, l.name as location, p.email 
+// $query = 'SELECT p.lastName, p.firstName, d.name as department, l.name as location, p.email 
+//           FROM personnel p 
+//           LEFT JOIN department d ON d.id = p.departmentID 
+//           LEFT JOIN location l ON l.id = d.locationID 
+//           ORDER BY p.lastName, p.firstName, d.name, l.name';
+$query = 'SELECT p.id, p.firstName, p.lastName, d.name as department, l.name as location, p.email 
           FROM personnel p 
           LEFT JOIN department d ON d.id = p.departmentID 
           LEFT JOIN location l ON l.id = d.locationID 

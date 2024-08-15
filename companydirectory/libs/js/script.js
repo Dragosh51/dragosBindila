@@ -268,13 +268,14 @@ function loadPersonnel() {
             if (result.status.name == "ok") {
                 $("#personnelTableBody .personnel-row:not(.d-none)").remove(); // Clear existing rows
                 result.data.forEach(person => {
+                    // console.log("all id's", person.id);
                     let $row = $("#personnelTableBody .personnel-row.d-none").clone().removeClass("d-none");
                     $row.find(".personnel-name").text(`${person.firstName} ${person.lastName}`);
                     $row.find(".personnel-jobTitle").text(person.department); // Update this line to use department instead of job title
                     $row.find(".personnel-location").text(person.location);
                     $row.find(".personnel-email").text(person.email);
-                    $row.find(".edit-personnel-btn").attr("data-id", person.id);
-                    $row.find(".delete-personnel-btn").attr("data-id", person.id);
+                    $row.find(".edit-personnel-btn").attr("data-id", person.id); // Set the personnel ID
+                    $row.find(".delete-personnel-btn").attr("data-id", person.id); // Set the personnel ID for delete button if needed
                     $("#personnelTableBody").append($row);
                 });
             }
@@ -283,7 +284,101 @@ function loadPersonnel() {
             console.log("Error: ", textStatus, errorThrown);
         }
     });
-  }
+}
+
+// Event listener for edit button
+$(document).on("click", ".edit-personnel-btn", function () {
+    const personnelID = $(this).data("id"); // Retrieve the personnel ID from the button's data-id attribute
+    console.log("Personnel ID:", personnelID);
+
+    // Here you would typically make an AJAX call to get the personnel details by ID
+    // For now, let's just log the personnel ID to the console
+});
+
+// Event listener to show the Edit Personnel Modal with the selected employee's details
+$("#editPersonnelModal").on("show.bs.modal", function (e) {
+    const personnelID = $(e.relatedTarget).attr("data-id"); // Get the personnel ID from the button
+    console.log("Editing personnel with ID:", personnelID); // Debug log to verify the ID
+
+    $.ajax({
+        url: "libs/php/getPersonnelByID.php",
+        type: "POST",
+        dataType: "json",
+        data: {
+            id: personnelID // Pass the personnel ID to the server
+        },
+        success: function (result) {
+            if (result.status.name == "ok") {
+                const personnel = result.data.personnel[0];
+                const departments = result.data.department;
+
+                // Populate the modal form fields with existing data
+                $("#editPersonnelEmployeeID").val(personnel.id);
+                $("#editPersonnelFirstName").val(personnel.firstName);
+                $("#editPersonnelLastName").val(personnel.lastName);
+                $("#editPersonnelJobTitle").val(personnel.jobTitle);
+                $("#editPersonnelEmailAddress").val(personnel.email);
+
+                // Populate the department dropdown
+                $("#editPersonnelDepartment").empty();
+                departments.forEach(department => {
+                    $("#editPersonnelDepartment").append(
+                        $("<option>", {
+                            value: department.id,
+                            text: department.name,
+                            selected: department.id == personnel.departmentID
+                        })
+                    );
+                });
+            } else {
+                console.error("Error retrieving data:", result.status.description);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error retrieving data:", textStatus, errorThrown);
+        }
+    });
+});
+
+// Event listener to handle form submission for editing personnel
+$("#editPersonnelForm").on("submit", function (e) {
+    e.preventDefault(); // Prevent the default form submission
+
+    const personnelID = $("#editPersonnelEmployeeID").val();
+    const firstName = $("#editPersonnelFirstName").val();
+    const lastName = $("#editPersonnelLastName").val();
+    const jobTitle = $("#editPersonnelJobTitle").val();
+    const email = $("#editPersonnelEmailAddress").val();
+    const departmentID = $("#editPersonnelDepartment").val();
+
+    $.ajax({
+        url: "libs/php/updatePersonnel.php",
+        type: "POST",
+        dataType: "json",
+        data: {
+            id: personnelID,
+            firstName: firstName,
+            lastName: lastName,
+            jobTitle: jobTitle,
+            email: email,
+            departmentID: departmentID
+        },
+        success: function (result) {
+            if (result.status.name == "ok") {
+                // Close the modal
+                $("#editPersonnelModal").modal("hide");
+
+                // Refresh the personnel table to reflect changes
+                loadPersonnel();
+            } else {
+                console.error("Error updating data:", result.status.description);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error updating data:", textStatus, errorThrown);
+        }
+    });
+});
 
 // Load Departments Table
 function loadDepartments() {
