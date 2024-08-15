@@ -101,7 +101,7 @@ $("#applyFilterBtn").click(function () {
       },
       success: function (result) {
           if (result.status.name == "ok") {
-              $("#personnelTableBody .personnel-row:not(.d-none)").remove(); // Clear existing rows except the template
+              $("#personnelTableBody .personnel-row:not(.d-none)").remove();
               result.data.forEach(person => {
                   let $row = $("#personnelTableBody .personnel-row.d-none").clone().removeClass("d-none");
                   $row.find(".personnel-name").text(`${person.firstName} ${person.lastName}`);
@@ -122,7 +122,7 @@ $("#applyFilterBtn").click(function () {
 });
 
 $("#addBtn").click(function () {
-    $(".add-form").addClass("d-none"); // Hide all forms by default
+    $(".add-form").addClass("d-none"); 
 
     if ($("#personnelBtn").hasClass("active")) {
         // Update modal for adding personnel
@@ -266,7 +266,7 @@ function loadPersonnel() {
         dataType: "json",
         success: function (result) {
             if (result.status.name == "ok") {
-                $("#personnelTableBody .personnel-row:not(.d-none)").remove(); // Clear existing rows
+                $("#personnelTableBody .personnel-row:not(.d-none)").remove(); 
                 result.data.forEach(person => {
                     // console.log("all id's", person.id);
                     let $row = $("#personnelTableBody .personnel-row.d-none").clone().removeClass("d-none");
@@ -274,8 +274,8 @@ function loadPersonnel() {
                     $row.find(".personnel-jobTitle").text(person.department); // Update this line to use department instead of job title
                     $row.find(".personnel-location").text(person.location);
                     $row.find(".personnel-email").text(person.email);
-                    $row.find(".edit-personnel-btn").attr("data-id", person.id); // Set the personnel ID
-                    $row.find(".delete-personnel-btn").attr("data-id", person.id); // Set the personnel ID for delete button if needed
+                    $row.find(".edit-personnel-btn").attr("data-id", person.id); 
+                    $row.find(".delete-personnel-btn").attr("data-id", person.id);
                     $("#personnelTableBody").append($row);
                 });
             }
@@ -288,24 +288,23 @@ function loadPersonnel() {
 
 // Event listener for edit button
 $(document).on("click", ".edit-personnel-btn", function () {
-    const personnelID = $(this).data("id"); // Retrieve the personnel ID from the button's data-id attribute
+    const personnelID = $(this).data("id"); 
     console.log("Personnel ID:", personnelID);
 
-    // Here you would typically make an AJAX call to get the personnel details by ID
-    // For now, let's just log the personnel ID to the console
+    
 });
 
 // Event listener to show the Edit Personnel Modal with the selected employee's details
 $("#editPersonnelModal").on("show.bs.modal", function (e) {
-    const personnelID = $(e.relatedTarget).attr("data-id"); // Get the personnel ID from the button
-    console.log("Editing personnel with ID:", personnelID); // Debug log to verify the ID
+    const personnelID = $(e.relatedTarget).attr("data-id"); 
+    console.log("Editing personnel with ID:", personnelID); 
 
     $.ajax({
         url: "libs/php/getPersonnelByID.php",
         type: "POST",
         dataType: "json",
         data: {
-            id: personnelID // Pass the personnel ID to the server
+            id: personnelID 
         },
         success: function (result) {
             if (result.status.name == "ok") {
@@ -385,20 +384,20 @@ let deletePersonnelID = null;
 
 // Event listener for delete button click
 $(document).on("click", ".delete-personnel-btn", function () {
-    deletePersonnelID = $(this).data("id"); // Store the personnel ID
-    console.log("Delete Personnel ID:", deletePersonnelID); // Debug log to check ID
-    $("#deletePersonnelModal").modal("show"); // Show the delete confirmation modal
+    deletePersonnelID = $(this).data("id"); 
+    // console.log("Delete Personnel ID:", deletePersonnelID); // Debug log to check ID
+    $("#deletePersonnelModal").modal("show"); 
 });
 
 // Event listener for confirming delete action
 $("#confirmDeletePersonnelBtn").click(function () {
     if (deletePersonnelID !== null) {
         $.ajax({
-            url: "libs/php/deletePersonnel.php", // You need to create this PHP file
+            url: "libs/php/deletePersonnel.php", 
             type: "POST",
             dataType: "json",
             data: {
-                id: deletePersonnelID // Send the personnel ID to be deleted
+                id: deletePersonnelID 
             },
             success: function (result) {
                 if (result.status.name == "ok") {
@@ -426,7 +425,7 @@ function loadDepartments() {
       dataType: "json",
       success: function (result) {
           if (result.status.name == "ok") {
-              $("#departmentTableBody .department-row:not(.d-none)").remove(); // Clear existing rows
+              $("#departmentTableBody .department-row:not(.d-none)").remove();
               result.data.forEach(department => {
                   let $row = $("#departmentTableBody .department-row.d-none").clone().removeClass("d-none");
                   $row.find(".department-name").text(department.name);
@@ -445,14 +444,14 @@ function loadDepartments() {
 
 // Event listener to show the Edit Department Modal with the selected department's details
 $("#editDepartmentModal").on("show.bs.modal", function (e) {
-    const departmentID = $(e.relatedTarget).attr("data-id"); // Get the department ID from the button
+    const departmentID = $(e.relatedTarget).attr("data-id"); 
 
     $.ajax({
-        url: "libs/php/getDepartmentByID.php", // You need to create this PHP file to fetch the department by ID
+        url: "libs/php/getDepartmentByID.php", 
         type: "POST",
         dataType: "json",
         data: {
-            id: departmentID // Pass the department ID to the server
+            id: departmentID 
         },
         success: function (result) {
             if (result.status.name == "ok") {
@@ -486,14 +485,14 @@ $("#editDepartmentModal").on("show.bs.modal", function (e) {
 
 // Event listener to handle form submission for editing department
 $("#editDepartmentForm").on("submit", function (e) {
-    e.preventDefault(); // Prevent the default form submission
+    e.preventDefault(); 
 
     const departmentID = $("#editDepartmentID").val();
     const name = $("#editDepartmentName").val();
     const locationID = $("#editDepartmentLocation").val();
 
     $.ajax({
-        url: "libs/php/updateDepartment.php", // You need to create this PHP file to update the department
+        url: "libs/php/updateDepartment.php", 
         type: "POST",
         dataType: "json",
         data: {
@@ -526,7 +525,7 @@ function loadLocations() {
       dataType: "json",
       success: function (result) {
           if (result.status.name == "ok") {
-              $("#locationTableBody .location-row:not(.d-none)").remove(); // Clear existing rows
+              $("#locationTableBody .location-row:not(.d-none)").remove(); 
               result.data.forEach(location => {
                   let $row = $("#locationTableBody .location-row.d-none").clone().removeClass("d-none");
                   $row.find(".location-name").text(location.name);
@@ -544,14 +543,14 @@ function loadLocations() {
 
 // Event listener to show the Edit Location Modal with the selected location's details
 $("#editLocationModal").on("show.bs.modal", function (e) {
-    const locationID = $(e.relatedTarget).attr("data-id"); // Get the location ID from the button
+    const locationID = $(e.relatedTarget).attr("data-id"); 
 
     $.ajax({
-        url: "libs/php/getLocationByID.php", // You need to create this PHP file to fetch the location by ID
+        url: "libs/php/getLocationByID.php", 
         type: "POST",
         dataType: "json",
         data: {
-            id: locationID // Pass the location ID to the server
+            id: locationID 
         },
         success: function (result) {
             if (result.status.name == "ok") {
@@ -572,13 +571,13 @@ $("#editLocationModal").on("show.bs.modal", function (e) {
 
 // Event listener to handle form submission for editing location
 $("#editLocationForm").on("submit", function (e) {
-    e.preventDefault(); // Prevent the default form submission
+    e.preventDefault(); 
 
     const locationID = $("#editLocationID").val();
     const name = $("#editLocationName").val();
 
     $.ajax({
-        url: "libs/php/updateLocation.php", // You need to create this PHP file to update the location
+        url: "libs/php/updateLocation.php", 
         type: "POST",
         dataType: "json",
         data: {
@@ -608,12 +607,12 @@ let deleteLocationID = null;
 
 // Event listener for delete department button click
 $(document).on("click", ".delete-department-btn", function () {
-    deleteDepartmentID = $(this).data("id"); // Store the department ID
-    console.log("Delete Department ID:", deleteDepartmentID); // Debug log to check ID
+    deleteDepartmentID = $(this).data("id"); 
+    //console.log("Delete Department ID:", deleteDepartmentID); // Debug log to check ID
 
     // Check if the department has employees
     $.ajax({
-        url: "libs/php/checkDepartment.php", // You need to create this PHP file
+        url: "libs/php/checkDepartment.php", 
         type: "POST",
         dataType: "json",
         data: {
@@ -643,16 +642,16 @@ $(document).on("click", ".delete-department-btn", function () {
 $("#confirmDeleteDepartmentBtn").click(function () {
     if (deleteDepartmentID !== null) {
         $.ajax({
-            url: "libs/php/deleteDepartment.php", // You need to create this PHP file
+            url: "libs/php/deleteDepartment.php", 
             type: "POST",
             dataType: "json",
             data: {
-                id: deleteDepartmentID // Send the department ID to be deleted
+                id: deleteDepartmentID 
             },
             success: function (result) {
                 if (result.status.name == "ok") {
                     $("#deleteDepartmentModal").modal("hide");
-                    loadDepartments(); // Refresh the departments table
+                    loadDepartments(); 
                 } else {
                     console.error("Error deleting department:", result.status.description);
                 }
@@ -666,12 +665,12 @@ $("#confirmDeleteDepartmentBtn").click(function () {
 
 // Event listener for delete location button click
 $(document).on("click", ".delete-location-btn", function () {
-    deleteLocationID = $(this).data("id"); // Store the location ID
-    console.log("Delete Location ID:", deleteLocationID); // Debug log to check ID
+    deleteLocationID = $(this).data("id"); 
+    //console.log("Delete Location ID:", deleteLocationID); // Debug log to check ID
 
     // Check if the location has departments
     $.ajax({
-        url: "libs/php/checkLocation.php", // You need to create this PHP file
+        url: "libs/php/checkLocation.php", 
         type: "POST",
         dataType: "json",
         data: {
@@ -701,16 +700,16 @@ $(document).on("click", ".delete-location-btn", function () {
 $("#confirmDeleteLocationBtn").click(function () {
     if (deleteLocationID !== null) {
         $.ajax({
-            url: "libs/php/deleteLocation.php", // You need to create this PHP file
+            url: "libs/php/deleteLocation.php", 
             type: "POST",
             dataType: "json",
             data: {
-                id: deleteLocationID // Send the location ID to be deleted
+                id: deleteLocationID 
             },
             success: function (result) {
                 if (result.status.name == "ok") {
                     $("#deleteLocationModal").modal("hide");
-                    loadLocations(); // Refresh the locations table
+                    loadLocations(); 
                 } else {
                     console.error("Error deleting location:", result.status.description);
                 }
