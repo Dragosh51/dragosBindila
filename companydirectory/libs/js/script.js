@@ -405,6 +405,81 @@ function loadDepartments() {
   });
 }
 
+// Event listener to show the Edit Department Modal with the selected department's details
+$("#editDepartmentModal").on("show.bs.modal", function (e) {
+    const departmentID = $(e.relatedTarget).attr("data-id"); // Get the department ID from the button
+
+    $.ajax({
+        url: "libs/php/getDepartmentByID.php", // You need to create this PHP file to fetch the department by ID
+        type: "POST",
+        dataType: "json",
+        data: {
+            id: departmentID // Pass the department ID to the server
+        },
+        success: function (result) {
+            if (result.status.name == "ok") {
+                const department = result.data.department[0];
+                const locations = result.data.locations;
+
+                // Populate the modal form fields with existing data
+                $("#editDepartmentID").val(department.id);
+                $("#editDepartmentName").val(department.name);
+
+                // Populate the location dropdown
+                $("#editDepartmentLocation").empty();
+                locations.forEach(location => {
+                    $("#editDepartmentLocation").append(
+                        $("<option>", {
+                            value: location.id,
+                            text: location.name,
+                            selected: location.id == department.locationID
+                        })
+                    );
+                });
+            } else {
+                console.error("Error retrieving data:", result.status.description);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error retrieving data:", textStatus, errorThrown);
+        }
+    });
+});
+
+// Event listener to handle form submission for editing department
+$("#editDepartmentForm").on("submit", function (e) {
+    e.preventDefault(); // Prevent the default form submission
+
+    const departmentID = $("#editDepartmentID").val();
+    const name = $("#editDepartmentName").val();
+    const locationID = $("#editDepartmentLocation").val();
+
+    $.ajax({
+        url: "libs/php/updateDepartment.php", // You need to create this PHP file to update the department
+        type: "POST",
+        dataType: "json",
+        data: {
+            id: departmentID,
+            name: name,
+            locationID: locationID
+        },
+        success: function (result) {
+            if (result.status.name == "ok") {
+                // Close the modal
+                $("#editDepartmentModal").modal("hide");
+
+                // Refresh the departments table to reflect changes
+                loadDepartments();
+            } else {
+                console.error("Error updating data:", result.status.description);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error updating data:", textStatus, errorThrown);
+        }
+    });
+});
+
 // Load Locations Table
 function loadLocations() {
   $.ajax({
@@ -428,6 +503,66 @@ function loadLocations() {
       }
   });
 }
+
+// Event listener to show the Edit Location Modal with the selected location's details
+$("#editLocationModal").on("show.bs.modal", function (e) {
+    const locationID = $(e.relatedTarget).attr("data-id"); // Get the location ID from the button
+
+    $.ajax({
+        url: "libs/php/getLocationByID.php", // You need to create this PHP file to fetch the location by ID
+        type: "POST",
+        dataType: "json",
+        data: {
+            id: locationID // Pass the location ID to the server
+        },
+        success: function (result) {
+            if (result.status.name == "ok") {
+                const location = result.data.location[0];
+
+                // Populate the modal form fields with existing data
+                $("#editLocationID").val(location.id);
+                $("#editLocationName").val(location.name);
+            } else {
+                console.error("Error retrieving data:", result.status.description);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error retrieving data:", textStatus, errorThrown);
+        }
+    });
+});
+
+// Event listener to handle form submission for editing location
+$("#editLocationForm").on("submit", function (e) {
+    e.preventDefault(); // Prevent the default form submission
+
+    const locationID = $("#editLocationID").val();
+    const name = $("#editLocationName").val();
+
+    $.ajax({
+        url: "libs/php/updateLocation.php", // You need to create this PHP file to update the location
+        type: "POST",
+        dataType: "json",
+        data: {
+            id: locationID,
+            name: name
+        },
+        success: function (result) {
+            if (result.status.name == "ok") {
+                // Close the modal
+                $("#editLocationModal").modal("hide");
+
+                // Refresh the locations table to reflect changes
+                loadLocations();
+            } else {
+                console.error("Error updating data:", result.status.description);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error updating data:", textStatus, errorThrown);
+        }
+    });
+});
 
 // Event listeners to load the data when tabs are clicked
 $("#personnelBtn").click(function () {
