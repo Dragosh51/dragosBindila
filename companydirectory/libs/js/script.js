@@ -289,7 +289,7 @@ function loadPersonnel() {
 // Event listener for edit button
 $(document).on("click", ".edit-personnel-btn", function () {
     const personnelID = $(this).data("id"); 
-    console.log("Personnel ID:", personnelID);
+    // console.log("Personnel ID:", personnelID);
 
     
 });
