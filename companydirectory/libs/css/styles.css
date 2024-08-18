@@ -24,3 +24,23 @@ tr {
 .myBtn {
   width: 70px;
 }
+
+/* Preloader Styles */
+#preloader {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 1s ease-in-out; /* Set transition for the fade out */
+}
+
+#preloader.fade-out {
+  opacity: 0;
+}
