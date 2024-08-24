@@ -31,10 +31,24 @@ $query = $conn->prepare('DELETE FROM location WHERE id = ?');
 $query->bind_param("i", $_POST['id']);
 $query->execute();
 
-if (false === $query) {
+if ($query === false) {
     $output['status']['code'] = "400";
     $output['status']['name'] = "executed";
     $output['status']['description'] = "query failed";
+    $output['data'] = [];
+
+    mysqli_close($conn);
+
+    echo json_encode($output);
+
+    exit;
+}
+
+// Check if any row was affected
+if ($query->affected_rows === 0) {
+    $output['status']['code'] = "404";
+    $output['status']['name'] = "not found";
+    $output['status']['description'] = "No location found with the given ID";
     $output['data'] = [];
 
     mysqli_close($conn);
