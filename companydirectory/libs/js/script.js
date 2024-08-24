@@ -48,16 +48,16 @@ $("#refreshBtn").click(function () {
 });
 
 $("#filterBtn").click(function () {
-    // Fetch departments and locations to populate dropdowns
+    // Populate the Department dropdown
     $.ajax({
         url: "libs/php/getAllDepartments.php",
         type: "GET",
         dataType: "json",
         success: function (result) {
             if (result.status.name == "ok") {
-                $("#filterDepartment").empty().append('<option value="">All Departments</option>');
+                $("#filterPersonnelByDepartment").empty().append('<option value="0">All Departments</option>');
                 result.data.forEach(department => {
-                    $("#filterDepartment").append(`<option value="${department.id}">${department.name}</option>`);
+                    $("#filterPersonnelByDepartment").append(`<option value="${department.id}">${department.name}</option>`);
                 });
             }
         },
@@ -66,15 +66,16 @@ $("#filterBtn").click(function () {
         }
     });
 
+    // Populate the Location dropdown
     $.ajax({
         url: "libs/php/getAllLocations.php",
         type: "GET",
         dataType: "json",
         success: function (result) {
             if (result.status.name == "ok") {
-                $("#filterLocation").empty().append('<option value="">All Locations</option>');
+                $("#filterPersonnelByLocation").empty().append('<option value="0">All Locations</option>');
                 result.data.forEach(location => {
-                    $("#filterLocation").append(`<option value="${location.id}">${location.name}</option>`);
+                    $("#filterPersonnelByLocation").append(`<option value="${location.id}">${location.name}</option>`);
                 });
             }
         },
@@ -82,44 +83,63 @@ $("#filterBtn").click(function () {
             console.log("Error: ", textStatus, errorThrown);
         }
     });
-
-    // Show the modal
-    $("#filterModal").modal("show");
 });
 
-$("#applyFilterBtn").click(function () {
-    const selectedDepartment = $("#filterDepartment").val();
-    const selectedLocation = $("#filterLocation").val();
+// Handle Department selection
+$("#filterPersonnelByDepartment").change(function () {
+    const selectedDepartment = $(this).val();
+    $("#filterPersonnelByLocation").val("0"); // Reset location to "All Locations"
+    
+    filterPersonnel(selectedDepartment, null); // Apply filter based on selected department
+});
 
+// Handle Location selection
+$("#filterPersonnelByLocation").change(function () {
+    const selectedLocation = $(this).val();
+    $("#filterPersonnelByDepartment").val("0"); // Reset department to "All Departments"
+    
+    filterPersonnel(null, selectedLocation); // Apply filter based on selected location
+});
+
+// Function to apply the filter based on selected department or location
+function filterPersonnel(departmentID, locationID) {
     $.ajax({
         url: "libs/php/getFilteredPersonnel.php",
         type: "POST",
         dataType: "json",
         data: {
-            departmentID: selectedDepartment,
-            locationID: selectedLocation
+            departmentID: departmentID !== "0" ? departmentID : null,
+            locationID: locationID !== "0" ? locationID : null
         },
         success: function (result) {
             if (result.status.name == "ok") {
+                // Clear the existing personnel list
                 $("#personnelTableBody .personnel-row:not(.d-none)").remove();
+                
+                if (result.data.length === 0) {
+                    console.log("No data found for the selected filter.");
+                }
+
+                // Populate the personnel table with the filtered results
                 result.data.forEach(person => {
                     let $row = $("#personnelTableBody .personnel-row.d-none").clone().removeClass("d-none");
-                    $row.find(".personnel-name").text(`${person.firstName} ${person.lastName}`);
-                    $row.find(".personnel-jobTitle").text(person.jobTitle);
+                    $row.find(".personnel-name").text(`${person.lastName} ${person.firstName}`);
+                    $row.find(".personnel-jobTitle").text(person.department);
                     $row.find(".personnel-location").text(person.location);
                     $row.find(".personnel-email").text(person.email);
                     $row.find(".edit-personnel-btn").attr("data-id", person.id);
                     $row.find(".delete-personnel-btn").attr("data-id", person.id);
                     $("#personnelTableBody").append($row);
                 });
-                $("#filterModal").modal("hide");
+            } else {
+                console.log("Error: ", result.status.description);
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.log("Error: ", textStatus, errorThrown);
         }
     });
-});
+}
 
 $("#addBtn").click(function () {
     $(".add-form").addClass("d-none");
@@ -270,7 +290,7 @@ function loadPersonnel() {
                 result.data.forEach(person => {
                     // console.log("all id's", person.id);
                     let $row = $("#personnelTableBody .personnel-row.d-none").clone().removeClass("d-none");
-                    $row.find(".personnel-name").text(`${person.firstName} ${person.lastName}`);
+                    $row.find(".personnel-name").text(`${person.lastName} ${person.firstName}`);
                     $row.find(".personnel-jobTitle").text(person.department); // Update this line to use department instead of job title
                     $row.find(".personnel-location").text(person.location);
                     $row.find(".personnel-email").text(person.email);
@@ -737,20 +757,4 @@ $("#locationsBtn").click(function () {
 // Load the default tab data (Personnel) when the page loads
 $(document).ready(function () {
     loadPersonnel();
-});
-
-// // Preloader functionality
-$(window).on('load', function () {
-    // Show the preloader initially
-    const preloader = document.getElementById('preloader');
-
-    // Set a timeout to start the fade-out after 1 second
-    setTimeout(function () {
-        preloader.classList.add('fade-out');
-    }, 1000); // 1 second delay before fading out
-
-    // Ensure the preloader is removed from the DOM after the fade-out completes
-    setTimeout(function () {
-        preloader.style.display = 'none';
-    }, 2000); // 1 second fade-out, so remove after 2 seconds in total
 });
