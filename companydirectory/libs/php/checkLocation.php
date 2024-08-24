@@ -38,6 +38,7 @@ $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 $output['data']['hasDepartments'] = $row['departmentCount'] > 0;
+$output['data']['departmentCount'] = $row['departmentCount'];
 
 mysqli_close($conn);
 
