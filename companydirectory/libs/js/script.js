@@ -211,82 +211,87 @@ $("#addModal").on("hidden.bs.modal", function () {
     $("#addLocationForm")[0].reset();
 });
 
-// Save button functionality
-$("#saveBtn").click(function () {
-    if ($("#addPersonnelForm").is(":visible")) {
-        // Save new personnel
-        const firstName = $("#addPersonnelFirstName").val();
-        const lastName = $("#addPersonnelLastName").val();
-        const email = $("#addPersonnelEmail").val();
-        const departmentID = $("#addPersonnelDepartment").val();
+// Handle form submission for adding personnel
+$("#addPersonnelForm").on("submit", function (e) {
+    e.preventDefault();
 
-        $.ajax({
-            url: "libs/php/insertPersonnel.php",
-            type: "POST",
-            dataType: "json",
-            data: {
-                firstName,
-                lastName,
-                email,
-                departmentID
-            },
-            success: function (result) {
-                if (result.status.name == "ok") {
-                    $("#addModal").modal("hide");
-                    loadPersonnel(); // Refresh the personnel table
-                }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log("Error: ", textStatus, errorThrown);
+    const firstName = $("#addPersonnelFirstName").val();
+    const lastName = $("#addPersonnelLastName").val();
+    const email = $("#addPersonnelEmail").val();
+    const departmentID = $("#addPersonnelDepartment").val();
+
+    $.ajax({
+        url: "libs/php/insertPersonnel.php",
+        type: "POST",
+        dataType: "json",
+        data: {
+            firstName,
+            lastName,
+            email,
+            departmentID
+        },
+        success: function (result) {
+            if (result.status.name == "ok") {
+                $("#addModal").modal("hide");
+                loadPersonnel(); // Refresh the personnel table
             }
-        });
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log("Error: ", textStatus, errorThrown);
+        }
+    });
+});
 
-    } else if ($("#addDepartmentForm").is(":visible")) {
-        // Save new department
-        const name = $("#addDepartmentName").val();
-        const locationID = $("#addDepartmentLocation").val();
+// Handle form submission for adding department
+$("#addDepartmentForm").on("submit", function (e) {
+    e.preventDefault();
 
-        $.ajax({
-            url: "libs/php/insertDepartment.php",
-            type: "POST",
-            dataType: "json",
-            data: {
-                name,
-                locationID
-            },
-            success: function (result) {
-                if (result.status.name == "ok") {
-                    $("#addModal").modal("hide");
-                    loadDepartments(); // Refresh the departments table
-                }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log("Error: ", textStatus, errorThrown);
+    const name = $("#addDepartmentName").val();
+    const locationID = $("#addDepartmentLocation").val();
+
+    $.ajax({
+        url: "libs/php/insertDepartment.php",
+        type: "POST",
+        dataType: "json",
+        data: {
+            name,
+            locationID
+        },
+        success: function (result) {
+            if (result.status.name == "ok") {
+                $("#addModal").modal("hide");
+                loadDepartments(); // Refresh the departments table
             }
-        });
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log("Error: ", textStatus, errorThrown);
+        }
+    });
+});
 
-    } else if ($("#addLocationForm").is(":visible")) {
-        // Save new location
-        const name = $("#addLocationName").val();
+// Handle form submission for adding location
+$("#addLocationForm").on("submit", function (e) {
+    e.preventDefault();
 
-        $.ajax({
-            url: "libs/php/insertLocation.php",
-            type: "POST",
-            dataType: "json",
-            data: {
-                name
-            },
-            success: function (result) {
-                if (result.status.name == "ok") {
-                    $("#addModal").modal("hide");
-                    loadLocations(); // Refresh the locations table
-                }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log("Error: ", textStatus, errorThrown);
+    const name = $("#addLocationName").val();
+
+    $.ajax({
+        url: "libs/php/insertLocation.php",
+        type: "POST",
+        dataType: "json",
+        data: {
+            name
+        },
+        success: function (result) {
+            if (result.status.name == "ok") {
+                $("#addModal").modal("hide");
+                loadLocations(); // Refresh the locations table
             }
-        });
-    }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log("Error: ", textStatus, errorThrown);
+        }
+    });
 });
 
 // Load Personnel Table

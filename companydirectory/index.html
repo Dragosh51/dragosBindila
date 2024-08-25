@@ -153,6 +153,8 @@
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          
+          <!-- Personnel Form -->
           <form id="addPersonnelForm" class="add-form d-none">
             <div class="form-floating mb-3">
               <input type="text" id="addPersonnelFirstName" class="form-control" placeholder="First Name">
@@ -172,8 +174,13 @@
               </select>
               <label for="addPersonnelDepartment">Department</label>
             </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
+              <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
+            </div>
           </form>
 
+          <!-- Department Form -->
           <form id="addDepartmentForm" class="add-form d-none">
             <div class="form-floating mb-3">
               <input type="text" id="addDepartmentName" class="form-control" placeholder="Department Name">
@@ -185,18 +192,24 @@
               </select>
               <label for="addDepartmentLocation">Location</label>
             </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
+              <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
+            </div>
           </form>
 
+          <!-- Location Form -->
           <form id="addLocationForm" class="add-form d-none">
             <div class="form-floating mb-3">
               <input type="text" id="addLocationName" class="form-control" placeholder="Location Name">
               <label for="addLocationName">Location Name</label>
             </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
+              <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
+            </div>
           </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-primary btn-sm myBtn" id="saveBtn">SAVE</button>
-          <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
+
         </div>
       </div>
     </div>
