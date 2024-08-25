@@ -302,22 +302,64 @@ function loadPersonnel() {
         dataType: "json",
         success: function (result) {
             if (result.status.name == "ok") {
-                $("#personnelTableBody .personnel-row:not(.d-none)").remove();
+                const frag = document.createDocumentFragment(); // Create a document fragment
                 result.data.forEach(person => {
-                    // console.log("all id's", person.id);
-                    let $row = $("#personnelTableBody .personnel-row.d-none").clone().removeClass("d-none");
-                    $row.find(".personnel-name").text(`${person.lastName} ${person.firstName}`);
-                    $row.find(".personnel-jobTitle").text(person.department); // Update this line to use department instead of job title
-                    $row.find(".personnel-location").text(person.location);
-                    $row.find(".personnel-email").text(person.email);
-                    $row.find(".edit-personnel-btn").attr("data-id", person.id);
-                    $row.find(".delete-personnel-btn").attr("data-id", person.id);
-                    $("#personnelTableBody").append($row);
+                    const row = document.createElement("tr");
+                    row.classList.add("personnel-row");
+
+                    const nameCell = document.createElement("td");
+                    nameCell.classList.add("align-middle", "text-nowrap", "personnel-name");
+                    nameCell.textContent = `${person.lastName} ${person.firstName}`;
+                    row.appendChild(nameCell);
+
+                    const jobTitleCell = document.createElement("td");
+                    jobTitleCell.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell", "personnel-jobTitle");
+                    jobTitleCell.textContent = person.department; 
+                    row.appendChild(jobTitleCell);
+
+                    const locationCell = document.createElement("td");
+                    locationCell.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell", "personnel-location");
+                    locationCell.textContent = person.location;
+                    row.appendChild(locationCell);
+
+                    const emailCell = document.createElement("td");
+                    emailCell.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell", "personnel-email");
+                    emailCell.textContent = person.email;
+                    row.appendChild(emailCell);
+
+                    const actionCell = document.createElement("td");
+                    actionCell.classList.add("text-end", "text-nowrap");
+
+                    // Edit button
+                    const editBtn = document.createElement("button");
+                    editBtn.classList.add("btn", "btn-primary", "btn-sm", "edit-personnel-btn");
+                    editBtn.setAttribute("data-bs-toggle", "modal");
+                    editBtn.setAttribute("data-bs-target", "#editPersonnelModal");
+                    editBtn.setAttribute("data-id", person.id); // Store ID in the button for reference
+                    editBtn.innerHTML = `<i class="fa-solid fa-pencil fa-fw"></i>`;
+                    actionCell.appendChild(editBtn);
+
+                    // Delete button
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.classList.add("btn", "btn-primary", "btn-sm", "delete-personnel-btn");
+                    deleteBtn.setAttribute("data-bs-toggle", "modal");
+                    deleteBtn.setAttribute("data-bs-target", "#deletePersonnelModal");
+                    deleteBtn.setAttribute("data-id", person.id); // Store ID in the button for reference
+                    deleteBtn.innerHTML = `<i class="fa-solid fa-trash fa-fw"></i>`;
+                    actionCell.appendChild(deleteBtn);
+
+                    row.appendChild(actionCell);
+
+                    frag.appendChild(row); // Append the row to the fragment
                 });
+
+                const personnelTableBody = document.getElementById("personnelTableBody");
+                personnelTableBody.innerHTML = ""; // Clear the existing table body
+                personnelTableBody.appendChild(frag); // Append the fragment to the table body
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log("Error: ", textStatus, errorThrown);
+            console.error("Error loading personnel data:", textStatus, errorThrown);
         }
     });
 }
@@ -461,23 +503,55 @@ function loadDepartments() {
         dataType: "json",
         success: function (result) {
             if (result.status.name == "ok") {
-                $("#departmentTableBody .department-row:not(.d-none)").remove();
+                const frag = document.createDocumentFragment();
                 result.data.forEach(department => {
-                    let $row = $("#departmentTableBody .department-row.d-none").clone().removeClass("d-none");
-                    $row.find(".department-name").text(department.name);
-                    $row.find(".department-location").text(department.location);
+                    const row = document.createElement("tr");
+                    row.classList.add("department-row");
 
-                    // Set the data-id and data-name attributes
-                    $row.find(".delete-department-btn").attr("data-id", department.id);
-                    $row.find(".delete-department-btn").attr("data-name", department.name);
+                    // Department Name
+                    const nameCell = document.createElement("td");
+                    nameCell.classList.add("align-middle", "text-nowrap", "department-name");
+                    nameCell.textContent = department.name;
+                    row.appendChild(nameCell);
 
-                    $row.find(".edit-department-btn").attr("data-id", department.id);
-                    $("#departmentTableBody").append($row);
+                    // Department Location
+                    const locationCell = document.createElement("td");
+                    locationCell.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell", "department-location");
+                    locationCell.textContent = department.location;
+                    row.appendChild(locationCell);
+
+                    // Actions
+                    const actionCell = document.createElement("td");
+                    actionCell.classList.add("text-end", "text-nowrap");
+
+                    const editBtn = document.createElement("button");
+                    editBtn.classList.add("btn", "btn-primary", "btn-sm", "edit-department-btn");
+                    editBtn.setAttribute("data-bs-toggle", "modal");
+                    editBtn.setAttribute("data-bs-target", "#editDepartmentModal");
+                    editBtn.setAttribute("data-id", department.id);
+                    editBtn.innerHTML = `<i class="fa-solid fa-pencil fa-fw"></i>`;
+                    actionCell.appendChild(editBtn);
+
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.classList.add("btn", "btn-primary", "btn-sm", "delete-department-btn");
+                    deleteBtn.setAttribute("data-bs-toggle", "modal");
+                    deleteBtn.setAttribute("data-bs-target", "#deleteDepartmentModal");
+                    deleteBtn.setAttribute("data-id", department.id);
+                    deleteBtn.setAttribute("data-name", department.name); // Set the department name here
+                    deleteBtn.innerHTML = `<i class="fa-solid fa-trash fa-fw"></i>`;
+                    actionCell.appendChild(deleteBtn);
+
+                    row.appendChild(actionCell);
+                    frag.appendChild(row);
                 });
+
+                const departmentTableBody = document.getElementById("departmentTableBody");
+                departmentTableBody.innerHTML = "";
+                departmentTableBody.appendChild(frag);
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log("Error: ", textStatus, errorThrown);
+            console.error("Error loading department data:", textStatus, errorThrown);
         }
     });
 }
@@ -565,22 +639,49 @@ function loadLocations() {
         dataType: "json",
         success: function (result) {
             if (result.status.name == "ok") {
-                $("#locationTableBody .location-row:not(.d-none)").remove();
+                const frag = document.createDocumentFragment();
                 result.data.forEach(location => {
-                    let $row = $("#locationTableBody .location-row.d-none").clone().removeClass("d-none");
-                    $row.find(".location-name").text(location.name);
+                    const row = document.createElement("tr");
+                    row.classList.add("location-row");
 
-                    // Set the data-id and data-name attributes
-                    $row.find(".delete-location-btn").attr("data-id", location.id);
-                    $row.find(".delete-location-btn").attr("data-name", location.name);
+                    // Location Name
+                    const nameCell = document.createElement("td");
+                    nameCell.classList.add("align-middle", "text-nowrap", "location-name");
+                    nameCell.textContent = location.name;
+                    row.appendChild(nameCell);
 
-                    $row.find(".edit-location-btn").attr("data-id", location.id);
-                    $("#locationTableBody").append($row);
+                    // Actions
+                    const actionCell = document.createElement("td");
+                    actionCell.classList.add("text-end", "text-nowrap");
+
+                    const editBtn = document.createElement("button");
+                    editBtn.classList.add("btn", "btn-primary", "btn-sm", "edit-location-btn");
+                    editBtn.setAttribute("data-bs-toggle", "modal");
+                    editBtn.setAttribute("data-bs-target", "#editLocationModal");
+                    editBtn.setAttribute("data-id", location.id);
+                    editBtn.innerHTML = `<i class="fa-solid fa-pencil fa-fw"></i>`;
+                    actionCell.appendChild(editBtn);
+
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.classList.add("btn", "btn-primary", "btn-sm", "delete-location-btn");
+                    deleteBtn.setAttribute("data-bs-toggle", "modal");
+                    deleteBtn.setAttribute("data-bs-target", "#deleteLocationModal");
+                    deleteBtn.setAttribute("data-id", location.id);
+                    deleteBtn.setAttribute("data-name", location.name); // Set the location name here
+                    deleteBtn.innerHTML = `<i class="fa-solid fa-trash fa-fw"></i>`;
+                    actionCell.appendChild(deleteBtn);
+
+                    row.appendChild(actionCell);
+                    frag.appendChild(row);
                 });
+
+                const locationTableBody = document.getElementById("locationTableBody");
+                locationTableBody.innerHTML = "";
+                locationTableBody.appendChild(frag);
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log("Error: ", textStatus, errorThrown);
+            console.error("Error loading location data:", textStatus, errorThrown);
         }
     });
 }
