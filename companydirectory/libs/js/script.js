@@ -114,29 +114,74 @@ function filterPersonnel(departmentID, locationID) {
         type: "POST",
         dataType: "json",
         data: {
-            departmentID: departmentID !== "0" ? departmentID : null,
-            locationID: locationID !== "0" ? locationID : null
+            departmentID: departmentID !== "0" ? departmentID : '',
+            locationID: locationID !== "0" ? locationID : ''
         },
         success: function (result) {
             if (result.status.name == "ok") {
                 // Clear the existing personnel list
-                $("#personnelTableBody .personnel-row:not(.d-none)").remove();
+                $("#personnelTableBody").empty();
 
                 if (result.data.length === 0) {
                     console.log("No data found for the selected filter.");
+                    return;
                 }
+
+                // Create a document fragment to append rows
+                const frag = document.createDocumentFragment();
 
                 // Populate the personnel table with the filtered results
                 result.data.forEach(person => {
-                    let $row = $("#personnelTableBody .personnel-row.d-none").clone().removeClass("d-none");
-                    $row.find(".personnel-name").text(`${person.lastName} ${person.firstName}`);
-                    $row.find(".personnel-jobTitle").text(person.department);
-                    $row.find(".personnel-location").text(person.location);
-                    $row.find(".personnel-email").text(person.email);
-                    $row.find(".edit-personnel-btn").attr("data-id", person.id);
-                    $row.find(".delete-personnel-btn").attr("data-id", person.id);
-                    $("#personnelTableBody").append($row);
+                    const row = document.createElement("tr");
+                    row.classList.add("personnel-row");
+
+                    const nameCell = document.createElement("td");
+                    nameCell.classList.add("align-middle", "text-nowrap", "personnel-name");
+                    nameCell.textContent = `${person.lastName} ${person.firstName}`;
+                    row.appendChild(nameCell);
+
+                    const jobTitleCell = document.createElement("td");
+                    jobTitleCell.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell", "personnel-jobTitle");
+                    jobTitleCell.textContent = person.department;
+                    row.appendChild(jobTitleCell);
+
+                    const locationCell = document.createElement("td");
+                    locationCell.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell", "personnel-location");
+                    locationCell.textContent = person.location;
+                    row.appendChild(locationCell);
+
+                    const emailCell = document.createElement("td");
+                    emailCell.classList.add("align-middle", "text-nowrap", "d-none", "d-md-table-cell", "personnel-email");
+                    emailCell.textContent = person.email;
+                    row.appendChild(emailCell);
+
+                    const actionsCell = document.createElement("td");
+                    actionsCell.classList.add("text-end", "text-nowrap");
+
+                    const editButton = document.createElement("button");
+                    editButton.classList.add("btn", "btn-primary", "btn-sm", "edit-personnel-btn","btn-spacing");
+                    editButton.setAttribute("data-bs-toggle", "modal");
+                    editButton.setAttribute("data-bs-target", "#editPersonnelModal");
+                    editButton.setAttribute("data-id", person.id);
+                    editButton.innerHTML = '<i class="fa-solid fa-pencil fa-fw"></i>';
+                    actionsCell.appendChild(editButton);
+
+                    const deleteButton = document.createElement("button");
+                    deleteButton.classList.add("btn", "btn-primary", "btn-sm", "delete-personnel-btn");
+                    deleteButton.setAttribute("data-bs-toggle", "modal");
+                    deleteButton.setAttribute("data-id", person.id);
+                    deleteButton.setAttribute("data-bs-target", "#deletePersonnelModal");
+                    deleteButton.innerHTML = '<i class="fa-solid fa-trash fa-fw"></i>';
+                    actionsCell.appendChild(deleteButton);
+
+                    row.appendChild(actionsCell);
+
+                    frag.appendChild(row);
                 });
+
+                // Append the document fragment to the table body
+                $("#personnelTableBody").append(frag);
+
             } else {
                 console.log("Error: ", result.status.description);
             }
@@ -302,7 +347,7 @@ function loadPersonnel() {
         dataType: "json",
         success: function (result) {
             if (result.status.name == "ok") {
-                const frag = document.createDocumentFragment(); // Create a document fragment
+                const frag = document.createDocumentFragment();
                 result.data.forEach(person => {
                     const row = document.createElement("tr");
                     row.classList.add("personnel-row");
@@ -332,10 +377,10 @@ function loadPersonnel() {
 
                     // Edit button
                     const editBtn = document.createElement("button");
-                    editBtn.classList.add("btn", "btn-primary", "btn-sm", "edit-personnel-btn");
+                    editBtn.classList.add("btn", "btn-primary", "btn-sm", "edit-personnel-btn","btn-spacing");
                     editBtn.setAttribute("data-bs-toggle", "modal");
                     editBtn.setAttribute("data-bs-target", "#editPersonnelModal");
-                    editBtn.setAttribute("data-id", person.id); // Store ID in the button for reference
+                    editBtn.setAttribute("data-id", person.id); 
                     editBtn.innerHTML = `<i class="fa-solid fa-pencil fa-fw"></i>`;
                     actionCell.appendChild(editBtn);
 
@@ -344,7 +389,7 @@ function loadPersonnel() {
                     deleteBtn.classList.add("btn", "btn-primary", "btn-sm", "delete-personnel-btn");
                     deleteBtn.setAttribute("data-bs-toggle", "modal");
                     deleteBtn.setAttribute("data-bs-target", "#deletePersonnelModal");
-                    deleteBtn.setAttribute("data-id", person.id); // Store ID in the button for reference
+                    deleteBtn.setAttribute("data-id", person.id); 
                     deleteBtn.innerHTML = `<i class="fa-solid fa-trash fa-fw"></i>`;
                     actionCell.appendChild(deleteBtn);
 
@@ -525,7 +570,7 @@ function loadDepartments() {
                     actionCell.classList.add("text-end", "text-nowrap");
 
                     const editBtn = document.createElement("button");
-                    editBtn.classList.add("btn", "btn-primary", "btn-sm", "edit-department-btn");
+                    editBtn.classList.add("btn", "btn-primary", "btn-sm", "edit-department-btn","btn-spacing");
                     editBtn.setAttribute("data-bs-toggle", "modal");
                     editBtn.setAttribute("data-bs-target", "#editDepartmentModal");
                     editBtn.setAttribute("data-id", department.id);
@@ -655,7 +700,7 @@ function loadLocations() {
                     actionCell.classList.add("text-end", "text-nowrap");
 
                     const editBtn = document.createElement("button");
-                    editBtn.classList.add("btn", "btn-primary", "btn-sm", "edit-location-btn");
+                    editBtn.classList.add("btn", "btn-primary", "btn-sm", "edit-location-btn","btn-spacing");
                     editBtn.setAttribute("data-bs-toggle", "modal");
                     editBtn.setAttribute("data-bs-target", "#editLocationModal");
                     editBtn.setAttribute("data-id", location.id);
