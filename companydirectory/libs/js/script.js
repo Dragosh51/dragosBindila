@@ -85,6 +85,12 @@ $("#filterPersonnelModal").on("show.bs.modal", function () {
     });
 });
 
+// Hidden event for filter modal to reset the dropdowns
+$("#filterPersonnelModal").on("hidden.bs.modal", function () {
+    $("#filterPersonnelByDepartment").val("0");
+    $("#filterPersonnelByLocation").val("0");
+});
+
 // Handle Department selection
 $("#filterPersonnelByDepartment").change(function () {
     const selectedDepartment = $(this).val();
@@ -141,6 +147,7 @@ function filterPersonnel(departmentID, locationID) {
     });
 }
 
+// Show event for add modal to populate dropdowns based on active tab
 $("#addModal").on("show.bs.modal", function () {
     $(".add-form").addClass("d-none");
 
@@ -197,7 +204,14 @@ $("#addModal").on("show.bs.modal", function () {
     }
 });
 
-// Save button functionality remains the same
+$("#addModal").on("hidden.bs.modal", function () {
+    // Reset all forms inside the modal
+    $("#addPersonnelForm")[0].reset();
+    $("#addDepartmentForm")[0].reset();
+    $("#addLocationForm")[0].reset();
+});
+
+// Save button functionality
 $("#saveBtn").click(function () {
     if ($("#addPersonnelForm").is(":visible")) {
         // Save new personnel

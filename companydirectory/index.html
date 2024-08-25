@@ -39,8 +39,7 @@
               data-bs-target="#filterPersonnelModal">
               <i class="fa-solid fa-filter fa-fw"></i>
             </button>
-            <button id="addBtn" type="button" class="btn btn-primary" data-bs-toggle="modal"
-            data-bs-target="#addModal">
+            <button id="addBtn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
               <i class="fa-solid fa-plus fa-fw"></i>
             </button>
           </div>
@@ -154,7 +153,7 @@
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div id="addPersonnelForm" class="add-form d-none">
+          <form id="addPersonnelForm" class="add-form d-none">
             <div class="form-floating mb-3">
               <input type="text" id="addPersonnelFirstName" class="form-control" placeholder="First Name">
               <label for="addPersonnelFirstName">First Name</label>
@@ -173,9 +172,9 @@
               </select>
               <label for="addPersonnelDepartment">Department</label>
             </div>
-          </div>
+          </form>
 
-          <div id="addDepartmentForm" class="add-form d-none">
+          <form id="addDepartmentForm" class="add-form d-none">
             <div class="form-floating mb-3">
               <input type="text" id="addDepartmentName" class="form-control" placeholder="Department Name">
               <label for="addDepartmentName">Department Name</label>
@@ -186,14 +185,14 @@
               </select>
               <label for="addDepartmentLocation">Location</label>
             </div>
-          </div>
+          </form>
 
-          <div id="addLocationForm" class="add-form d-none">
+          <form id="addLocationForm" class="add-form d-none">
             <div class="form-floating mb-3">
               <input type="text" id="addLocationName" class="form-control" placeholder="Location Name">
               <label for="addLocationName">Location Name</label>
             </div>
-          </div>
+          </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-primary btn-sm myBtn" id="saveBtn">SAVE</button>
