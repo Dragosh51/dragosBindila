@@ -47,7 +47,7 @@ $("#refreshBtn").click(function () {
     // $("#applyFilterBtn").trigger("click");
 });
 
-$("#filterBtn").click(function () {
+$("#filterPersonnelModal").on("show.bs.modal", function () {
     // Populate the Department dropdown
     $.ajax({
         url: "libs/php/getAllDepartments.php",
@@ -141,7 +141,7 @@ function filterPersonnel(departmentID, locationID) {
     });
 }
 
-$("#addBtn").click(function () {
+$("#addModal").on("show.bs.modal", function () {
     $(".add-form").addClass("d-none");
 
     if ($("#personnelBtn").hasClass("active")) {
@@ -160,7 +160,6 @@ $("#addBtn").click(function () {
                     result.data.forEach(department => {
                         $("#addPersonnelDepartment").append(`<option value="${department.id}">${department.name}</option>`);
                     });
-                    $("#addModal").modal("show");
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -184,7 +183,6 @@ $("#addBtn").click(function () {
                     result.data.forEach(location => {
                         $("#addDepartmentLocation").append(`<option value="${location.id}">${location.name}</option>`);
                     });
-                    $("#addModal").modal("show");
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -196,11 +194,10 @@ $("#addBtn").click(function () {
         // Update modal for adding location
         $("#addModalLabel").text("Add Location");
         $("#addLocationForm").removeClass("d-none");
-        $("#addModal").modal("show");
     }
 });
 
-// Save button functionality
+// Save button functionality remains the same
 $("#saveBtn").click(function () {
     if ($("#addPersonnelForm").is(":visible")) {
         // Save new personnel
@@ -742,14 +739,17 @@ $("#confirmDeleteLocationBtn").click(function () {
 // Event listeners to load the data when tabs are clicked
 $("#personnelBtn").click(function () {
     loadPersonnel();
+    $("#filterBtn").attr("disabled", false);
 });
 
 $("#departmentsBtn").click(function () {
     loadDepartments();
+    $("#filterBtn").attr("disabled", true);
 });
 
 $("#locationsBtn").click(function () {
     loadLocations();
+    $("#filterBtn").attr("disabled", true);
 });
 
 // Load the default tab data (Personnel) when the page loads
