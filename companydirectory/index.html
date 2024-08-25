@@ -318,65 +318,69 @@
 
   <!-- Updated Delete Personnel Modal -->
   <div id="deletePersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false"
-    aria-labelledby="deletePersonnelModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-      <div class="modal-content shadow">
-        <div class="modal-header bg-primary bg-gradient text-white">
-          <h5 class="modal-title" id="deletePersonnelModalLabel">Remove employee entry?</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to delete this employee?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-primary btn-sm myBtn" id="confirmDeletePersonnelBtn">YES</button>
-          <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
-        </div>
+  aria-labelledby="deletePersonnelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content shadow">
+      <div class="modal-header bg-primary bg-gradient text-white">
+        <h5 class="modal-title" id="deletePersonnelModalLabel">Remove employee entry?</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this employee?</p>
+      </div>
+      <div class="modal-footer">
+        <form id="deletePersonnelForm">
+          <button type="submit" class="btn btn-outline-primary btn-sm myBtn" id="confirmDeletePersonnelBtn">YES</button>
+        </form>
+        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Updated Delete Department Modal -->
   <div id="deleteDepartmentModal" class="modal fade" tabindex="-1" data-bs-backdrop="false"
-    aria-labelledby="deleteDepartmentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-      <div class="modal-content shadow">
-        <div class="modal-header bg-primary bg-gradient text-white">
-          <h5 class="modal-title" id="deleteDepartmentModalLabel">Delete Department</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p id="deleteDepartmentMessage">Are you sure you want to delete this department?</p>
-        </div>
-        <div class="modal-footer" id="deleteDepartmentFooter">
-          <button type="button" class="btn btn-outline-primary btn-sm myBtn d-none"
-            id="confirmDeleteDepartmentBtn">YES</button>
-          <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
-        </div>
+  aria-labelledby="deleteDepartmentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content shadow">
+      <div class="modal-header bg-primary bg-gradient text-white">
+        <h5 class="modal-title" id="deleteDepartmentModalLabel">Delete Department</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="deleteDepartmentMessage">Are you sure you want to delete this department?</p>
+      </div>
+      <div class="modal-footer" id="deleteDepartmentFooter">
+        <form id="deleteDepartmentForm">
+          <button type="submit" class="btn btn-outline-primary btn-sm myBtn" id="confirmDeleteDepartmentBtn">YES</button>
+        </form>
+        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Updated Delete Location Modal -->
   <div id="deleteLocationModal" class="modal fade" tabindex="-1" data-bs-backdrop="false"
-    aria-labelledby="deleteLocationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-      <div class="modal-content shadow">
-        <div class="modal-header bg-primary bg-gradient text-white">
-          <h5 class="modal-title" id="deleteLocationModalLabel">Delete Location</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p id="deleteLocationMessage">Are you sure you want to delete this location?</p>
-        </div>
-        <div class="modal-footer" id="deleteLocationFooter">
-          <button type="button" class="btn btn-outline-primary btn-sm myBtn d-none"
-            id="confirmDeleteLocationBtn">YES</button>
-          <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
-        </div>
+  aria-labelledby="deleteLocationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content shadow">
+      <div class="modal-header bg-primary bg-gradient text-white">
+        <h5 class="modal-title" id="deleteLocationModalLabel">Delete Location</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="deleteLocationMessage">Are you sure you want to delete this location?</p>
+      </div>
+      <div class="modal-footer" id="deleteLocationFooter">
+        <form id="deleteLocationForm">
+          <button type="submit" class="btn btn-outline-primary btn-sm myBtn" id="confirmDeleteLocationBtn">YES</button>
+        </form>
+        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Filter Modal -->
   <div id="filterPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false"

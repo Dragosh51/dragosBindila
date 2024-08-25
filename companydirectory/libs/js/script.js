@@ -429,7 +429,9 @@ $(document).on("click", ".delete-personnel-btn", function () {
 });
 
 // Event listener for confirming delete action
-$("#confirmDeletePersonnelBtn").click(function () {
+$("#deletePersonnelForm").on("submit", function (e) {
+    e.preventDefault(); // Prevent the default form submission
+
     if (deletePersonnelID !== null) {
         $.ajax({
             url: "libs/php/deletePersonnel.php",
@@ -681,8 +683,10 @@ $(document).on("click", ".delete-department-btn", function () {
 });
 
 // Event listener for confirming delete department action
-$("#confirmDeleteDepartmentBtn").click(function () {
-    const departmentID = $(this).data("id");
+$("#deleteDepartmentForm").on("submit", function (e) {
+    e.preventDefault(); // Prevent the default form submission
+
+    const departmentID = $("#confirmDeleteDepartmentBtn").data("id");
 
     $.ajax({
         url: "libs/php/deleteDepartment.php",
@@ -693,6 +697,8 @@ $("#confirmDeleteDepartmentBtn").click(function () {
             if (result.status.name == "ok") {
                 $("#deleteDepartmentModal").modal("hide");
                 loadDepartments(); // Reload the departments list
+            } else {
+                console.error("Error deleting department:", result.status.description);
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -735,8 +741,10 @@ $(document).on("click", ".delete-location-btn", function () {
 });
 
 // Event listener for confirming delete location action
-$("#confirmDeleteLocationBtn").click(function () {
-    const locationID = $(this).data("id");
+$("#deleteLocationForm").on("submit", function (e) {
+    e.preventDefault(); // Prevent the default form submission
+
+    const locationID = $("#confirmDeleteLocationBtn").data("id");
 
     $.ajax({
         url: "libs/php/deleteLocation.php",
@@ -747,6 +755,8 @@ $("#confirmDeleteLocationBtn").click(function () {
             if (result.status.name == "ok") {
                 $("#deleteLocationModal").modal("hide");
                 loadLocations(); // Reload the locations list
+            } else {
+                console.error("Error deleting location:", result.status.description);
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
