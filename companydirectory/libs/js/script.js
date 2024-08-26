@@ -809,12 +809,12 @@ $(document).on("click", ".delete-department-btn", function () {
             if (result.status.name == "ok") {
                 if (result.data.hasEmployees) {
                     const employeeCount = result.data.employeeCount;
-                    $("#deleteDepartmentMessage").text(`You cannot remove the entry for ${departmentName} because it has ${employeeCount} employees assigned to it.`);
+                    $("#deleteDepartmentMessage").html(`You cannot remove the entry for <strong>${departmentName}</strong> because it has <strong>${employeeCount}</strong> employees assigned to it.`);
                     $("#deleteDepartmentModalLabel").text("Cannot remove department ...");
                     $("#confirmDeleteDepartmentBtn").addClass("d-none");
                     $("#deleteDepartmentFooter button[data-bs-dismiss='modal']").text("OK");
                 } else {
-                    $("#deleteDepartmentMessage").text(`Are you sure that you want to remove the entry for ${departmentName}?`);
+                    $("#deleteDepartmentMessage").html(`Are you sure that you want to remove the entry for <strong>${departmentName}</strong>?`);
                     $("#deleteDepartmentModalLabel").text("Remove department?");
                     $("#confirmDeleteDepartmentBtn").removeClass("d-none").data("id", departmentID);
                     $("#deleteDepartmentFooter button[data-bs-dismiss='modal']").text("No");
@@ -867,12 +867,12 @@ $(document).on("click", ".delete-location-btn", function () {
             if (result.status.name == "ok") {
                 if (result.data.hasDepartments) {
                     const departmentCount = result.data.departmentCount;
-                    $("#deleteLocationMessage").text(`You cannot remove the entry for ${locationName} because it has ${departmentCount} departments assigned to it.`);
+                    $("#deleteLocationMessage").html(`You cannot remove the entry for <strong>${locationName}</strong> because it has <strong>${departmentCount}</strong> departments assigned to it.`);
                     $("#deleteLocationModalLabel").text("Cannot remove location ...");
                     $("#confirmDeleteLocationBtn").addClass("d-none");
                     $("#deleteLocationFooter button[data-bs-dismiss='modal']").text("OK");
                 } else {
-                    $("#deleteLocationMessage").text(`Are you sure that you want to remove the entry for ${locationName}?`);
+                    $("#deleteLocationMessage").html(`Are you sure that you want to remove the entry for <strong>${locationName}</strong>?`);
                     $("#deleteLocationModalLabel").text("Remove location?");
                     $("#confirmDeleteLocationBtn").removeClass("d-none").data("id", locationID);
                     $("#deleteLocationFooter button[data-bs-dismiss='modal']").text("No");
