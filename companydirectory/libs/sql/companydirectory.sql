@@ -130,7 +130,7 @@ INSERT INTO `personnel` (`id`, `firstName`, `lastName`, `jobTitle`, `email`, `de
 	(58, 'Roanna', 'Standering', '', 'rstandering1l@cocolog-nifty.com', 3),
 	(59, 'Lorrie', 'Fattorini', '', 'lfattorini1m@geocities.jp', 9),
 	(60, 'Talbot', 'Andrassy', '', 'tandrassy1n@bigcartel.com', 4),
-	(61, 'Cindi', 'O\'Mannion', '', 'comannion1o@ameblo.jp', 11),
+	(61, 'Cindi', 'O\Mannion', '', 'comannion1o@ameblo.jp', 11),
 	(62, 'Pancho', 'Mullineux', '', 'pmullineux1p@webmd.com', 1),
 	(63, 'Cynthy', 'Peyntue', '', 'cpeyntue1q@amazon.co.jp', 6),
 	(64, 'Kristine', 'Christal', '', 'kchristal1r@behance.net', 8),
