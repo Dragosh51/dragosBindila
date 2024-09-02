@@ -26,7 +26,7 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-$query = $conn->prepare('SELECT COUNT(*) as departmentCount FROM department WHERE locationID = ?');
+$query = $conn->prepare('SELECT COUNT(id) as departmentCount FROM department WHERE locationID = ?');
 $query->bind_param("i", $_POST['id']);
 $query->execute();
 

@@ -137,7 +137,7 @@ function filterPersonnel(departmentID, locationID) {
 
                     const nameCell = document.createElement("td");
                     nameCell.classList.add("align-middle", "text-nowrap", "personnel-name");
-                    nameCell.textContent = `${person.lastName} ${person.firstName}`;
+                    nameCell.textContent = `${person.lastName}, ${person.firstName}`;
                     row.appendChild(nameCell);
 
                     const jobTitleCell = document.createElement("td");
@@ -354,7 +354,7 @@ function loadPersonnel() {
 
                     const nameCell = document.createElement("td");
                     nameCell.classList.add("align-middle", "text-nowrap", "personnel-name");
-                    nameCell.textContent = `${person.lastName} ${person.firstName}`;
+                    nameCell.textContent = `${person.lastName}, ${person.firstName}`;
                     row.appendChild(nameCell);
 
                     const jobTitleCell = document.createElement("td");

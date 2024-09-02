@@ -26,7 +26,7 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-$query = $conn->prepare('SELECT COUNT(*) as employeeCount FROM personnel WHERE departmentID = ?');
+$query = $conn->prepare('SELECT COUNT(id) as employeeCount FROM personnel WHERE departmentID = ?');
 $query->bind_param("i", $_POST['id']);
 $query->execute();
 
