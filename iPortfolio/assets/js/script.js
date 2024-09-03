@@ -1,6 +1,6 @@
 $(document).ready(function () {
-  $('#submit-button').on('click', function (e) {
-    e.preventDefault();
+  $('#contact-form').on('submit', function (e) {
+    e.preventDefault(); // Prevent the default form submission
 
     // Gather form data
     const name = $('#name-field').val();
@@ -32,6 +32,7 @@ $(document).ready(function () {
         // Show success message
         $('.sent-message').text(response).show();
 
+        // Clear input fields for subject and message
         $('#subject-field').val('');
         $('#message-field').val('');
 
