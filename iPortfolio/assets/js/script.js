@@ -32,6 +32,9 @@ $(document).ready(function () {
         // Show success message
         $('.sent-message').text(response).show();
 
+        $('#subject-field').val('');
+        $('#message-field').val('');
+
         // Hide success message after 1 second
         setTimeout(function () {
           $('.sent-message').fadeOut();
