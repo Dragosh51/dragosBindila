@@ -49,11 +49,20 @@
    * Preloader
    */
   const preloader = document.querySelector('#preloader');
-  if (preloader) {
-    window.addEventListener('load', () => {
-      preloader.remove();
-    });
-  }
+if (preloader) {
+  window.addEventListener('load', () => {
+    // Add a delay of 1 second (1000 milliseconds)
+    setTimeout(() => {
+      preloader.style.transition = 'opacity 1s ease'; // Smooth fade-out
+      preloader.style.opacity = '0'; // Fade out
+
+      // Remove the preloader from the DOM after the fade-out
+      setTimeout(() => {
+        preloader.remove();
+      }, 1000); // Remove after the fade-out duration
+    }, 1000); // Initial delay before fading out
+  });
+}
 
   /**
    * Scroll top button
