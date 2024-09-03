@@ -48,6 +48,10 @@ $("#refreshBtn").click(function () {
 });
 
 $("#filterPersonnelModal").on("show.bs.modal", function () {
+    // Store the current values of the selects
+    var currentFilterDepartmentSelect = $('#filterPersonnelByDepartment').val(); 
+    var currentFilterLocationSelect = $('#filterPersonnelByLocation').val(); 
+
     // Populate the Department dropdown
     $.ajax({
         url: "libs/php/getAllDepartments.php",
@@ -59,6 +63,8 @@ $("#filterPersonnelModal").on("show.bs.modal", function () {
                 result.data.forEach(department => {
                     $("#filterPersonnelByDepartment").append(`<option value="${department.id}">${department.name}</option>`);
                 });
+                // Restore the department select to the stored value
+                $('#filterPersonnelByDepartment').val(currentFilterDepartmentSelect);
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -77,6 +83,8 @@ $("#filterPersonnelModal").on("show.bs.modal", function () {
                 result.data.forEach(location => {
                     $("#filterPersonnelByLocation").append(`<option value="${location.id}">${location.name}</option>`);
                 });
+                // Restore the location select to the stored value
+                $('#filterPersonnelByLocation').val(currentFilterLocationSelect);
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -86,10 +94,10 @@ $("#filterPersonnelModal").on("show.bs.modal", function () {
 });
 
 // Hidden event for filter modal to reset the dropdowns
-$("#filterPersonnelModal").on("hidden.bs.modal", function () {
-    $("#filterPersonnelByDepartment").val("0");
-    $("#filterPersonnelByLocation").val("0");
-});
+// $("#filterPersonnelModal").on("hidden.bs.modal", function () {
+//     $("#filterPersonnelByDepartment").val("0");
+//     $("#filterPersonnelByLocation").val("0");
+// });
 
 // Handle Department selection
 $("#filterPersonnelByDepartment").change(function () {
