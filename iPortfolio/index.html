@@ -54,7 +54,8 @@
     </a>
 
     <div class="social-links text-center">
-      <a href="https://www.linkedin.com/in/dragos-bindila-7b8a4422b/" class="linkedin" target="_blank"><i class="bi bi-linkedin"></i></a>
+      <a href="https://www.linkedin.com/in/dragos-bindila-7b8a4422b/" class="linkedin" target="_blank"><i
+          class="bi bi-linkedin"></i></a>
     </div>
 
     <nav id="navmenu" class="navmenu">
@@ -308,7 +309,6 @@
             </div>
           </div><!-- End Portfolio Item -->
 
-          <!-- Modals (Leave these unchanged) -->
           <div class="modal fade" id="projectModal1" tabindex="-1" aria-labelledby="projectModal1Label"
             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -318,8 +318,26 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  Country and information search web application that allows users to find details about various
-                  countries, including demographics, geographical data, and more.
+                  <p>Country and information search web application that allows users to find details about various
+                    countries, including demographics, geographical data, and more.</p>
+                  <p>The website has the following features:</p>
+                  <ul>
+                    <li>Automatically selects the country that you are accessing the website from.</li>
+                    <li>Displays the border of the country and marks the cities and airports of that country.</li>
+                    <li>The website has 5 buttons:
+                      <ul>
+                        <li><strong>Information:</strong> Shows the user general information about the country.</li>
+                        <li><strong>Weather:</strong> Shows the user the current weather and also a forecast.</li>
+                        <li><strong>News:</strong> Shows the user recent news from the selected country.</li>
+                        <li><strong>Wikipedia:</strong> Shows the user Wikipedia pages from the selected country.</li>
+                        <li><strong>Currency Calculator:</strong> Allows the user to convert dollars into the currency
+                          of the selected country.</li>
+                      </ul>
+                    </li>
+                  </ul>
+                  <p><strong>Languages:</strong> HTML, CSS, JavaScript, PHP</p>
+                  <p><strong>Libraries:</strong> Leaflet, Bootstrap, JQuery</p>
+                  <p><strong>Tools:</strong> Git, GitHub</p>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-primary rounded"
@@ -338,8 +356,26 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  Company staff management web application that helps businesses keep track of employees, departments,
-                  and their roles within the organization.
+                  <p>Company staff management web application that helps businesses keep track of employees,
+                    departments, and their roles within the organization.</p>
+                  <p>The website has the following features:</p>
+                  <ul>
+                    <li>A search bar that filters the currently displayed table dynamically.</li>
+                    <li>A refresh button that refreshes the table.</li>
+                    <li>A filter button that filters employees either by department or location. The button is disabled
+                      for the "Departments" and "Locations" nav tabs.</li>
+                    <li>An add button that adds either an employee, a department, or a location depending on which nav
+                      tab is currently open.</li>
+                    <li>All tables are populated from a SQL database and are ordered in alphabetical order.</li>
+                    <li>All the entries in each table have an "Edit" and "Delete" button, allowing the user to update or
+                      delete an entry.</li>
+                    <li>The "Delete" modal in the "Departments" and "Locations" nav tabs will not allow the user to
+                      delete an entry if the entry has any dependencies.</li>
+                  </ul>
+                  <p><strong>Languages:</strong> HTML, CSS, JavaScript, PHP</p>
+                  <p><strong>Database:</strong> SQL</p>
+                  <p><strong>Libraries:</strong> Bootstrap, JQuery</p>
+                  <p><strong>Tools:</strong> Git, GitHub</p>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-primary rounded"
@@ -354,46 +390,46 @@
 
 
     <!-- Contact Section -->
-<section id="contact" class="contact section">
-  <!-- Section Title -->
-  <div class="container section-title" data-aos="fade-up">
-    <h2>Contact</h2>
-    <p>Feel free to reach out using the form below:</p>
-  </div><!-- End Section Title -->
+    <section id="contact" class="contact section">
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Contact</h2>
+        <p>Feel free to reach out using the form below:</p>
+      </div><!-- End Section Title -->
 
-  <div class="container">
-    <!-- Center the form container -->
-    <div class="col-lg-7 mx-auto">
-      <!-- Contact Form -->
-      <form id="contact-form" data-aos="fade-up" data-aos-delay="200">
-        <div class="row gy-4">
-          <div class="col-md-6">
-            <label for="name-field" class="pb-2">Your Name</label>
-            <input type="text" id="name-field" class="form-control" required="">
-          </div>
-          <div class="col-md-6">
-            <label for="email-field" class="pb-2">Your Email</label>
-            <input type="email" id="email-field" class="form-control" required="">
-          </div>
-          <div class="col-md-12">
-            <label for="subject-field" class="pb-2">Subject</label>
-            <input type="text" id="subject-field" class="form-control" required="">
-          </div>
-          <div class="col-md-12">
-            <label for="message-field" class="pb-2">Message</label>
-            <textarea class="form-control" id="message-field" rows="10" required=""></textarea>
-          </div>
-          <div class="col-md-12 text-center">
-            <div class="loading" style="display: none;">Loading</div>
-            <div class="error-message" style="display: none;"></div>
-            <div class="sent-message" style="display: none;">Your message has been sent. Thank you!</div>
-            <button type="submit" class="btn btn-primary">Send Message</button>
-          </div>
+      <div class="container">
+        <!-- Center the form container -->
+        <div class="col-lg-7 mx-auto">
+          <!-- Contact Form -->
+          <form id="contact-form" data-aos="fade-up" data-aos-delay="200">
+            <div class="row gy-4">
+              <div class="col-md-6">
+                <label for="name-field" class="pb-2">Your Name</label>
+                <input type="text" id="name-field" class="form-control" required="">
+              </div>
+              <div class="col-md-6">
+                <label for="email-field" class="pb-2">Your Email</label>
+                <input type="email" id="email-field" class="form-control" required="">
+              </div>
+              <div class="col-md-12">
+                <label for="subject-field" class="pb-2">Subject</label>
+                <input type="text" id="subject-field" class="form-control" required="">
+              </div>
+              <div class="col-md-12">
+                <label for="message-field" class="pb-2">Message</label>
+                <textarea class="form-control" id="message-field" rows="10" required=""></textarea>
+              </div>
+              <div class="col-md-12 text-center">
+                <div class="loading" style="display: none;">Loading</div>
+                <div class="error-message" style="display: none;"></div>
+                <div class="sent-message" style="display: none;">Your message has been sent. Thank you!</div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+              </div>
+            </div>
+          </form><!-- End Contact Form -->
         </div>
-      </form><!-- End Contact Form -->
-    </div>
-  </div>
-</section><!-- /Contact Section -->
+      </div>
+    </section><!-- /Contact Section -->
 
   </main>
 
@@ -435,7 +471,7 @@
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
 
   <!-- Main JS File -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="assets/js/jquery-3.6.0.min.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/script.js"></script>
 
