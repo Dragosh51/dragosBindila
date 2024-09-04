@@ -1256,3 +1256,7 @@ section,
   /* Add your styles here */
 }
 
+.custom-btn {
+  padding: 0.5rem 1rem; /* Adjust the padding as needed */
+  font-size: 1rem; /* Adjust the font size if needed */
+}
