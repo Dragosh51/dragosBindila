@@ -38,29 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $mail->send();
 
-        // Send auto-reply to the user
-        $autoReply = new PHPMailer(true);
-        $autoReply->isSMTP();
-        $autoReply->Host = 'smtp.gmail.com';
-        $autoReply->SMTPAuth = true;
-        $autoReply->Username = 'dragosh.bindila@gmail.com'; // Your Gmail address
-        $autoReply->Password = 'jyvi kvwy osrz oevb'; // The 16-digit app password from Google
-        $autoReply->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $autoReply->Port = 587;
-
-        // Recipients for auto-reply
-        $autoReply->setFrom('dragosh.bindila@gmail.com', 'Dragos Bindila'); // Your email and name
-        $autoReply->addAddress($email, $name); // User's email
-
-        // Auto-reply content
-        $autoReply->isHTML(true);
-        $autoReply->Subject = 'Thank you for contacting me';
-        $autoReply->Body = '<p>Hello!</p><p>Thank you so much for wanting to get in contact with me!</p><p>This is an automatic reply but I will get back to you as soon as I can!</p><p>Kind regards,<br>Dragos</p>';
-        $autoReply->AltBody = "Hello!\n\nThank you so much for wanting to get in contact with me!\nThis is an automatic reply but I will get back to you as soon as I can!\n\nKind regards,\nDragos";
-
-        $autoReply->send();
-
-        echo 'Message has been sent and an auto-reply has been sent to the user.';
+        echo 'Message has been sent.';
     } catch (Exception $e) {
         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
