@@ -32,7 +32,9 @@ $(document).ready(function () {
         // Show success message
         $('.sent-message').text(response).show();
 
-        // Clear input fields for subject and message
+        // Clear input fields
+        $('#name-field').val('');
+        $('#email-field').val('');
         $('#subject-field').val('');
         $('#message-field').val('');
 
