@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Recipients
         $mail->setFrom($email, $name); // User's email
-        $mail->addAddress('your-email@example.com', 'Your Name'); // Your receiving email
+        $mail->addAddress('dragosh.bindila@gmail.com', 'Dragos'); // Your receiving email
 
         // Content
         $mail->isHTML(true);
